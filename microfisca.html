@@ -1,0 +1,1925 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="MicroFisca — Simulateur pour comprendre le régime micro-fiscal en moins de 5 minutes.">
+  <meta name="color-scheme" content="light">
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="googlebot" content="noindex">
+  <title>MicroFisca — Simulateur Express</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* ════════════════════════════════════════════════════════════════
+       MicroFisca — feuille de styles
+       Couleurs : jaune #facc15 / bordeaux #800000
+       Polices : Plus Jakarta Sans (texte) + JetBrains Mono (chiffres)
+       ════════════════════════════════════════════════════════════════ */
+
+    :root {
+      --primary: #facc15;
+      --primary-tint: rgba(250, 204, 21, 0.10);
+      --primary-edge: rgba(250, 204, 21, 0.33);
+      --accent: #800000;
+      --accent-tint: rgba(128, 0, 0, 0.06);
+      --accent-edge: rgba(128, 0, 0, 0.33);
+
+      --bg: oklch(97% 0 0);
+      --card: oklch(100% 0 0);
+      --ink: oklch(20% 0 0);
+      --muted: oklch(62% 0 0);
+      --border: oklch(92% 0 0);
+      --border-strong: oklch(85% 0 0);
+      --neutral-tint: oklch(95% 0 0);
+
+      --success: #16a34a;
+      --success-content: #15803d;
+      --warn: #d97706;
+      --warn-content: #92400e;
+      --error: #dc2626;
+      --error-content: #991b1b;
+
+      --radius-card: 16px;
+      --radius-btn-lg: 14px;
+      --radius-btn: 12px;
+      --radius-input: 10px;
+      --radius-pill: 9999px;
+
+      --font-text: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+      --shadow-sm: 0 1px 4px oklch(0% 0 0 / 0.05);
+      --shadow-md: 0 2px 12px oklch(0% 0 0 / 0.08);
+      --shadow-lg: 0 2px 8px oklch(0% 0 0 / 0.15);
+
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { min-height: 100%; }
+    body {
+      font-family: var(--font-text);
+      background: var(--bg);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      line-height: 1.5;
+    }
+
+    button { font-family: inherit; }
+    input, textarea, select { font: inherit; color: inherit; }
+    a { color: inherit; }
+
+    /* Spinner controls neutralisés */
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+
+    /* Focus visible : accessibilité clavier sans bruit visuel à la souris */
+    :focus { outline: none; }
+    :focus-visible {
+      outline: 2px solid var(--ink);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+    button:focus-visible,
+    a:focus-visible {
+      outline-offset: 3px;
+    }
+
+    /* ─── Layout général ─────────────────────────────────────────── */
+    .page {
+      min-height: 100vh;
+      padding: 40px 16px 80px;
+    }
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    /* ─── En-tête (logo + tagline) ───────────────────────────────── */
+    .header {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 32px;
+      width: fit-content;
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      text-align: left;
+    }
+    .header__mark {
+      width: 40px; height: 40px;
+      flex-shrink: 0;
+      margin-top: 2px;
+      border-radius: 10px;
+      background: var(--primary);
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 150ms var(--ease);
+    }
+    .header:hover .header__mark { transform: scale(1.07); }
+    .header__mark svg { width: 32px; height: 30px; stroke-width: 1.5; }
+    .header__title {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      color: var(--ink);
+    }
+    .header__title em {
+      color: var(--accent);
+      font-style: normal;
+    }
+    .header__tagline {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 3px;
+      line-height: 1.5;
+    }
+
+    /* ─── Indicateur d'étapes ────────────────────────────────────── */
+    .steps {
+      display: flex;
+      align-items: center;
+      margin-bottom: 28px;
+    }
+    .steps__item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      flex: 0 0 auto;
+    }
+    .steps__bullet {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      background: var(--card);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      cursor: default;
+      transition: all 200ms var(--ease);
+      flex-shrink: 0;
+      padding: 0;
+    }
+    .steps__bullet[data-state="active"] {
+      border: none;
+      background: var(--ink);
+      color: var(--card);
+      box-shadow: var(--shadow-lg);
+    }
+    .steps__bullet[data-state="done"] {
+      border: none;
+      background: var(--primary);
+      color: var(--ink);
+      cursor: pointer;
+    }
+    .steps__bullet[data-state="done"]:hover {
+      transform: scale(1.05);
+    }
+    .steps__label {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      text-align: center;
+      white-space: nowrap;
+      color: var(--muted);
+    }
+    .steps__label[data-state="active"],
+    .steps__label[data-state="done"] {
+      color: var(--ink);
+    }
+    .steps__label[data-state="active"] {
+      font-weight: 700;
+    }
+    .steps__bar {
+      flex: 1;
+      height: 2px;
+      margin: 0 6px 20px;
+      background: var(--border);
+      transition: background 300ms var(--ease);
+      min-width: 16px;
+    }
+    .steps__bar[data-state="done"] { background: var(--primary); }
+
+    /* ─── Cards & blocs ──────────────────────────────────────────── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    /* Ligne de calcul */
+    .calc-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 11px 20px;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .calc-row:last-child { border-bottom: none; }
+    .calc-row[data-size="lg"] { padding: 14px 20px; }
+    .calc-row[data-tinted] {
+      background: rgba(250, 204, 21, 0.10);
+    }
+    .calc-row[data-highlight] .calc-row__label,
+    .calc-row[data-tinted] .calc-row__label {
+      color: var(--accent);
+      font-weight: 700;
+    }
+    .calc-row[data-highlight][data-label-ink] .calc-row__label {
+      color: var(--ink);
+    }
+    .calc-row__head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+    .calc-row__label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ink);
+    }
+    .calc-row[data-size="lg"] .calc-row__label { font-size: 14px; }
+    .calc-row__badge {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: var(--radius-pill);
+      background: var(--primary);
+      color: var(--ink);
+    }
+    .calc-row__value {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 700;
+      white-space: nowrap;
+      color: var(--ink);
+    }
+    .calc-row[data-size="lg"] .calc-row__value { font-size: 16px; }
+    .calc-row__value[data-color="accent"] { color: var(--accent); }
+    .calc-row__value[data-color="muted"] { color: var(--muted); }
+    .calc-row__value[data-color="error"] { color: var(--error-content); }
+
+    /* Bloc d'information (encart coloré) */
+    .info {
+      padding: 12px 14px;
+      border-radius: 10px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      border: 1px solid;
+      font-size: 13px;
+      line-height: 1.65;
+      margin-top: 10px;
+    }
+    .info__icon {
+      font-size: 15px;
+      line-height: 1;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .info[data-tone="yellow"] {
+      background: var(--primary-tint);
+      border-color: var(--primary-edge);
+      color: var(--accent);
+    }
+    .info[data-tone="orange"] {
+      background: rgba(217, 119, 6, 0.10);
+      border-color: rgba(217, 119, 6, 0.33);
+      color: var(--warn-content);
+    }
+    .info[data-tone="neutral"] {
+      background: var(--neutral-tint);
+      border-color: var(--border);
+      color: var(--muted);
+    }
+    .info[data-tone="error"] {
+      background: rgba(220, 38, 38, 0.06);
+      border-color: rgba(220, 38, 38, 0.30);
+      color: var(--error-content);
+    }
+    .info strong { font-weight: 700; }
+
+    /* Section titres pour le verdict */
+    .section-head { margin-bottom: 20px; }
+    .section-head h2 {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+    .section-head p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .recap-stripe {
+      padding: 10px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--neutral-tint);
+    }
+    .recap-stripe[data-tone="accent"] {
+      padding: 7px 20px;
+      background: var(--accent-tint);
+    }
+    .recap-stripe[data-tone="primary"] {
+      padding: 7px 20px;
+      background: rgba(250, 204, 21, 0.15);
+      border-top: 2px solid var(--border);
+    }
+    .recap-stripe__eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .recap-stripe[data-tone="accent"] .recap-stripe__eyebrow { color: var(--accent); font-size: 10px; }
+    .recap-stripe[data-tone="primary"] .recap-stripe__eyebrow { color: var(--ink); font-size: 10px; }
+    .recap-stripe__activity {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 600; color: var(--ink);
+    }
+
+    /* ─── Inputs numériques ──────────────────────────────────────── */
+    .num-input {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .num-input__field {
+      width: 120px;
+      text-align: right;
+      font-family: var(--font-mono);
+      font-size: 15px;
+      font-weight: 700;
+      padding: 7px 11px;
+      border-radius: 8px;
+      border: 1.5px solid var(--border);
+      background: var(--card);
+      color: var(--ink);
+      transition: border-color 150ms;
+    }
+    .num-input__field:focus {
+      border-color: var(--primary);
+      outline: none;
+    }
+    .num-input__suffix {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .num-input__minus {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .inline-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 11px 20px;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .inline-row[data-align="top"] { align-items: flex-start; }
+    .inline-row__label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ink);
+    }
+    .inline-row__sub {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.55;
+      margin-top: 4px;
+    }
+
+    /* ─── Boutons ────────────────────────────────────────────────── */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: var(--ink);
+      color: var(--card);
+      border: none;
+      border-radius: var(--radius-btn);
+      padding: 13px 28px;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+      transition: transform 120ms var(--ease), background 150ms;
+    }
+    .btn-primary:hover:not(:disabled) { transform: scale(1.02); }
+    .btn-primary:active:not(:disabled) { transform: scale(0.98); }
+    .btn-primary:disabled {
+      background: var(--border);
+      color: var(--muted);
+      cursor: not-allowed;
+    }
+
+    .btn-cta {
+      width: 100%;
+      padding: 16px 32px;
+      border-radius: var(--radius-btn-lg);
+      background: var(--ink);
+      color: var(--card);
+      border: none;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: transform 120ms var(--ease);
+    }
+    .btn-cta:hover { transform: scale(1.01); }
+    .btn-cta:active { transform: scale(0.99); }
+
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      padding: 4px 0;
+      transition: color 150ms;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .btn-back:hover { color: var(--ink); }
+
+    .btn-restart {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: none;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 150ms;
+    }
+    .btn-restart:hover { border-color: var(--ink); color: var(--ink); }
+
+    .btn-link-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+    }
+    .btn-link-inline:hover { text-decoration: underline; text-underline-offset: 2px; }
+
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 24px;
+    }
+    .nav--end { justify-content: flex-end; }
+
+    /* ─── Sélecteur de régime (Step 1) ──────────────────────────── */
+    .regime-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .regime {
+      padding: 18px 20px;
+      border-radius: var(--radius-btn-lg);
+      text-align: left;
+      border: 1.5px solid var(--border);
+      background: var(--card);
+      cursor: pointer;
+      transition: border-color 150ms, box-shadow 150ms, transform 150ms var(--ease);
+      width: 100%;
+    }
+    .regime:hover { transform: translateY(-1px); }
+    .regime[aria-pressed="true"] {
+      border: 2px solid var(--ink);
+      box-shadow: var(--shadow-md);
+    }
+    .regime__head {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 6px;
+    }
+    .regime__radio {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      background: var(--card);
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 150ms;
+    }
+    .regime[aria-pressed="true"] .regime__radio {
+      border: none;
+      background: var(--ink);
+    }
+    .regime__radio::after {
+      content: "";
+      width: 0; height: 0;
+      border-radius: 50%;
+      background: var(--card);
+      transition: all 120ms;
+    }
+    .regime[aria-pressed="true"] .regime__radio::after {
+      width: 8px; height: 8px;
+    }
+    .regime__name {
+      font-size: 15px; font-weight: 700; color: var(--ink);
+    }
+    .regime__tag {
+      font-family: var(--font-mono);
+      font-size: 10px; font-weight: 700;
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+      letter-spacing: 0.08em;
+      background: oklch(92% 0 0);
+      color: var(--muted);
+      transition: all 150ms;
+    }
+    .regime[aria-pressed="true"] .regime__tag {
+      background: var(--primary);
+      color: var(--ink);
+    }
+    .regime__desc {
+      font-size: 13px;
+      color: var(--muted);
+      margin-left: 30px;
+      line-height: 1.5;
+      margin-bottom: 6px;
+    }
+    .regime__meta {
+      margin-left: 30px;
+      display: flex; gap: 12px; flex-wrap: wrap;
+    }
+    .regime__chip {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+    .regime__chip--abat {
+      color: var(--accent);
+      background: rgba(250, 204, 21, 0.20);
+    }
+    .regime__chip--cot {
+      color: var(--muted);
+      background: oklch(93% 0 0);
+    }
+
+    /* ─── Verdict / Analyse express ─────────────────────────────── */
+    .verdict {
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .verdict__status {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .verdict__label {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 14px; font-weight: 800;
+    }
+    .verdict__dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .verdict__diff {
+      margin-left: auto;
+      font-family: var(--font-mono);
+      font-size: 12px; font-weight: 700;
+      text-align: right;
+    }
+    .verdict[data-tone="success"] .verdict__label,
+    .verdict[data-tone="success"] .verdict__diff { color: var(--success-content); }
+    .verdict[data-tone="success"] .verdict__dot { background: var(--success); }
+    .verdict[data-tone="warn"] .verdict__label,
+    .verdict[data-tone="warn"] .verdict__diff { color: var(--warn-content); }
+    .verdict[data-tone="warn"] .verdict__dot { background: var(--warn); }
+    .verdict[data-tone="error"] .verdict__label,
+    .verdict[data-tone="error"] .verdict__diff { color: var(--error-content); }
+    .verdict[data-tone="error"] .verdict__dot { background: var(--error); }
+
+    .chart {
+      position: relative;
+    }
+    .chart__refline {
+      position: absolute;
+      left: 0; right: 0;
+      border-top: 2px dashed var(--border);
+      transition: bottom 600ms var(--ease);
+    }
+    .chart__bars {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 32px;
+      position: relative;
+      z-index: 1;
+    }
+    .chart__col {
+      flex: 1;
+      max-width: 160px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100%;
+      justify-content: flex-end;
+    }
+    .chart__amount {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      text-align: center;
+    }
+    .chart__amount--accent { color: var(--accent); }
+    .chart__amount--ink { color: var(--ink); }
+    .chart__bar {
+      width: 100%;
+      border-radius: 8px 8px 0 0;
+      box-shadow: var(--shadow-md);
+      transition: height 600ms var(--ease);
+    }
+    .chart__bar--accent { background: var(--accent); }
+    .chart__bar--primary { background: var(--primary); }
+    .chart__caption {
+      padding-top: 10px;
+      text-align: center;
+    }
+    .chart__caption-title {
+      font-size: 12px; font-weight: 700;
+    }
+    .chart__caption-title--accent { color: var(--accent); }
+    .chart__caption-sub {
+      font-size: 11px; color: var(--muted); margin-top: 2px;
+    }
+    .chart__baseline {
+      position: absolute;
+      left: 0; right: 0;
+      height: 1px;
+      background: var(--border);
+      z-index: 2;
+    }
+    .verdict__copy {
+      padding-top: 20px;
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .verdict__copy p {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .verdict__copy strong { color: var(--ink); font-weight: 800; font-size: 17px; }
+    .verdict__copy strong.weak { font-size: inherit; font-weight: 700; }
+
+    /* ─── Step 0 / Step 5 ────────────────────────────────────────── */
+    .lede h2 {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      margin-bottom: 20px;
+    }
+    .lede p, .copy p {
+      font-size: 15px;
+      line-height: 1.75;
+      color: var(--muted);
+    }
+    .lede p strong, .copy p strong { color: var(--ink); }
+    .copy {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+	
+	/* ─── Page À propos : sections et listes ─────────────────────── */
+    .about-section {
+      margin-bottom: 32px;
+    }
+    .about-section h3 {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 14px;
+    }
+    .about-section p {
+      font-size: 15px;
+      line-height: 1.75;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+    .about-section p:last-child { margin-bottom: 0; }
+    .about-section p strong { color: var(--ink); font-weight: 700; }
+    .about-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .about-list li {
+      font-size: 14px;
+      line-height: 1.65;
+      color: var(--muted);
+      padding-left: 20px;
+      position: relative;
+    }
+    .about-list li::before {
+      content: "";
+      position: absolute;
+      left: 6px;
+      top: 10px;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #000;
+    }
+    .about-list li strong { color: var(--ink); font-weight: 700; }
+	/* fin à propos */
+
+    .feedback-card {
+      padding: 28px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 12px;
+    }
+    .feedback-card__icon {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      background: var(--primary);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .feedback-card__icon svg { stroke-width: 1.5; }
+    }
+    .feedback-card__title {
+      font-size: 18px; font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+    }
+    .feedback-card__desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 380px;
+    }
+    .feedback-card__btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+      padding: 12px 24px;
+      border-radius: 12px;
+      background: var(--ink);
+      color: var(--card);
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: transform 120ms var(--ease);
+    }
+    .feedback-card__btn:hover { transform: scale(1.02); }
+
+    /* ─── Étape : champ unique CA / Charges (gros input vertical) */
+    .big-num {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .big-num__field {
+      flex: 1;
+      text-align: right;
+      font-family: var(--font-mono);
+      font-size: 22px;
+      font-weight: 700;
+      padding: 12px 16px;
+      border-radius: var(--radius-input);
+      border: 1.5px solid var(--border);
+      background: var(--card);
+      color: var(--ink);
+      transition: border-color 150ms;
+    }
+    .big-num__field:focus { border-color: var(--primary); outline: none; }
+    .big-num__suffix {
+      font-size: 16px;
+      color: var(--muted);
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    /* ─── Footer ─────────────────────────────────────────────────── */
+    .footer {
+      margin-top: 48px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .footer__nav {
+      display: flex;
+      align-items: center;
+    }
+    .footer__link {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      padding: 0;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      transition: color 150ms;
+    }
+    .footer__link:hover { color: var(--ink); }
+	.footer__author {
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 150ms;
+    }
+    .footer__author:hover { color: var(--ink); }
+    .footer__sep {
+      margin: 0 8px;
+      color: var(--border-strong);
+    }	
+
+    /* ─── Animations ─────────────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .step-enter {
+      animation: fadeUp 220ms var(--ease) both;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* ─── Mobile ─────────────────────────────────────────────────── */
+    @media (max-width: 480px) {
+      .page { padding: 28px 14px 60px; }
+      .header__title { font-size: 22px; }
+      .lede h2 { font-size: 24px; }
+      .chart__bars { gap: 18px; }
+      .num-input__field { width: 110px; font-size: 14px; }
+      /* Empile les actions de navigation : bouton primaire en haut full-width, retour en dessous */
+      .nav {
+        flex-direction: column-reverse;
+        align-items: stretch;
+        gap: 14px;
+      }
+      .nav .btn-primary,
+      .nav .btn-restart {
+        width: 100%;
+        justify-content: center;
+      }
+      .nav .btn-back { align-self: center; }
+      .nav--end { align-items: stretch; }
+    }
+  </style>
+</head>
+<body>
+  <main id="app" class="page" aria-live="polite"></main>
+
+  <script>
+  /*  ════════════════════════════════════════════════════════════════
+      MicroFisca — application standalone (vanilla JS)
+      Données fiscales : voir bloc REGIMES ci-dessous (sources URSSAF /
+      Service-Public.fr / BOFiP, dernière vérification dans le commentaire).
+      ════════════════════════════════════════════════════════════════ */
+  'use strict';
+
+  /* ────────────────────────────────────────────────────────────────
+     1. DONNÉES FISCALES — barèmes 2026
+     ----------------------------------------------------------------
+     Sources :
+       • Abattements forfaitaires : Code général des impôts
+            – BIC : art. 50-0 (https://bofip.impots.gouv.fr/bofip/3610-PGP)
+            – BNC : art. 102 ter (https://bofip.impots.gouv.fr/bofip/3610-PGP)
+       • Cotisations sociales : barème URSSAF 2026
+            https://www.urssaf.fr/accueil/independant/exercer-mon-activite/microentrepreneur-auto-entrepreneur.html
+       • Plafonds de chiffre d'affaires : Service-Public.fr
+            https://www.service-public.fr/particuliers/vosdroits/F23267
+
+     Dernière vérification : 2026-04-27
+     ──────────────────────────────────────────────────────────────── */
+
+  const REGIMES = {
+    bnc: {
+      nom: 'Professions libérales',
+      tag: 'BNC',
+      abattement: 0.34,    // CGI art. 102 ter — stable depuis 2009
+      cotisations: 0.231,  // URSSAF 2026 — BNC libéral non-CIPAV (réforme progressive 2024-2027)
+      desc: 'Consultants, freelances, professions de santé, enseignants, artistes…',
+      exemple: 'Consultant RH, graphiste, coach, kinésithérapeute'
+    },
+    bic_services: {
+      nom: 'Prestations de services',
+      tag: 'BIC',
+      abattement: 0.50,    // CGI art. 50-0 — stable
+      cotisations: 0.212,  // URSSAF 2026 — BIC services
+      desc: 'Artisans, prestataires de services commerciaux ou artisanaux.',
+      exemple: 'Plombier, coiffeur à domicile, développeur web (statut commercial)'
+    },
+    bic_vente: {
+      nom: 'Vente de marchandises',
+      tag: 'BIC',
+      abattement: 0.71,    // CGI art. 50-0 — stable
+      cotisations: 0.123,  // URSSAF 2026 — BIC vente / hébergement
+      desc: 'Achat-revente, restauration sur place, hébergement.',
+      exemple: 'E-commerce, restaurateur, gérant de chambre d’hôtes'
+    }
+  };
+
+  // Plafonds CA 2026 (au-delà : sortie du régime micro à terme)
+  const SEUILS_CA = {
+    bnc: 77700,
+    bic_services: 77700,
+    bic_vente: 188700
+  };
+
+  const DERNIERE_MAJ = 'Avril 2026';
+
+  /* ────────────────────────────────────────────────────────────────
+     2. HELPERS
+     ──────────────────────────────────────────────────────────────── */
+
+  const fmtEUR = (n) => new Intl.NumberFormat('fr-FR',
+    { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n);
+
+  const fmtPct = (n) => (n * 100).toLocaleString('fr-FR',
+    { maximumFractionDigits: 1 }) + ' %';
+
+  const fmtEURplain = (n) => new Intl.NumberFormat('fr-FR',
+    { maximumFractionDigits: 0 }).format(n);
+
+  // Validation d'entrée numérique : refuse négatifs, infinis et au-delà de 1 milliard
+  const safeNum = (raw) => {
+    const v = parseFloat(raw);
+    if (!Number.isFinite(v)) return 0;
+    return Math.max(0, Math.min(v, 1e9));
+  };
+
+  // Création d'élément concis
+  function el(tag, attrs, ...children) {
+    const node = document.createElement(tag);
+    if (attrs) {
+      for (const [k, v] of Object.entries(attrs)) {
+        if (v == null || v === false) continue;
+        if (k === 'class') node.className = v;
+        else if (k === 'dataset') Object.assign(node.dataset, v);
+        else if (k === 'style' && typeof v === 'object') Object.assign(node.style, v);
+        else if (k === 'html') node.innerHTML = v;
+        else if (k.startsWith('on') && typeof v === 'function') {
+          node.addEventListener(k.slice(2).toLowerCase(), v);
+        } else if (typeof v === 'boolean') {
+          if (v) node.setAttribute(k, '');
+        } else {
+          node.setAttribute(k, v);
+        }
+      }
+    }
+    for (const c of children.flat(Infinity)) {
+      if (c == null || c === false) continue;
+      node.appendChild(typeof c === 'string' || typeof c === 'number'
+        ? document.createTextNode(c) : c);
+    }
+    return node;
+  }
+
+  // Helper SVG inline (icônes statiques de confiance)
+  function svgIcon(markup, size = 16, extraAttrs = '') {
+    const wrap = document.createElement('span');
+    wrap.style.display = 'inline-flex';
+    wrap.innerHTML = markup
+      .replace('<svg', `<svg width="${size}" height="${size}" ${extraAttrs}`);
+    return wrap.firstElementChild;
+  }
+
+  const ICONS = {
+    chevronRight: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>',
+    chevronLeft:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>',
+    check:        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+    restart:      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>',
+    edit:         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>',
+    piggy:        '<svg viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.66 3.58 3 8 3s8-1.34 8-3V6"/><path d="M4 12v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg>'
+  };
+
+  /* ────────────────────────────────────────────────────────────────
+     3. CALCUL FISCAL (cœur métier)
+     ──────────────────────────────────────────────────────────────── */
+
+  function computeAll(regime, ca, chargesReelles) {
+    const r = REGIMES[regime];
+    const abattement = ca * r.abattement;
+    const revenusImposables = ca - abattement;
+    const cotisations = ca * r.cotisations;
+    const totalCharges = cotisations + chargesReelles;
+    const netReel = ca - totalCharges;
+    return { abattement, revenusImposables, cotisations, totalCharges, netReel };
+  }
+
+  // Seuil d'optimisation microfisca : tant que charges_réelles/CA < (%abattement − %cotisations),
+  // le micro-fiscal est avantageux.
+  function thresholdPct(regime) {
+    const r = REGIMES[regime];
+    return ((r.abattement - r.cotisations) * 100).toFixed(1);
+  }
+
+  /* ────────────────────────────────────────────────────────────────
+     4. ÉTAT GLOBAL & NAVIGATION
+     ──────────────────────────────────────────────────────────────── */
+
+  const state = {
+    step: 0,
+    prevStep: null,
+    regime: null,
+    ca: '',        // chaîne brute du champ (vide = non saisi)
+    charges: ''
+  };
+
+  function setState(patch) {
+    Object.assign(state, patch);
+    render();
+  }
+
+  const goTo = (s) => setState({ prevStep: state.step, step: s });
+  const next = () => setState({ prevStep: state.step, step: Math.min(state.step + 1, 4) });
+  const back = () => setState({ prevStep: state.step, step: Math.max(state.step - 1, 1) });
+  const home = () => setState({
+    step: 0, prevStep: null, regime: null, ca: '', charges: ''
+  });
+  const restart = () => setState({
+    step: 1, prevStep: null, regime: null, ca: '', charges: ''
+  });
+
+  /* ────────────────────────────────────────────────────────────────
+     5. COMPOSANTS RÉUTILISABLES
+     ──────────────────────────────────────────────────────────────── */
+
+  function Card(children, extraClass = '') {
+    return el('div', { class: 'card ' + extraClass }, children);
+  }
+
+  function CalcRow({ label, value, badge, valueColor, size, tinted, highlight, labelInk }) {
+    return el('div', {
+      class: 'calc-row',
+      dataset: {
+        ...(size ? { size } : {}),
+        ...(tinted ? { tinted: '' } : {}),
+        ...(highlight ? { highlight: '' } : {}),
+        ...(labelInk ? { labelInk: '' } : {})
+      }
+    },
+      el('div', { class: 'calc-row__head' },
+        el('span', { class: 'calc-row__label' }, label),
+        badge ? el('span', { class: 'calc-row__badge' }, badge) : null
+      ),
+      el('span', {
+        class: 'calc-row__value',
+        ...(valueColor ? { dataset: { color: valueColor } } : {})
+      }, value)
+    );
+  }
+
+  function InfoBox({ tone = 'neutral', icon, html, children }) {
+    const body = el('div');
+    if (html) body.innerHTML = html;
+    else if (children) {
+      (Array.isArray(children) ? children : [children]).forEach(c => {
+        if (c) body.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+      });
+    }
+    return el('div', { class: 'info', dataset: { tone } },
+      icon ? el('span', { class: 'info__icon' }, icon) : null,
+      body
+    );
+  }
+
+  function PrimaryBtn(label, onClick, { disabled = false } = {}) {
+    return el('button', {
+      class: 'btn-primary',
+      type: 'button',
+      disabled: disabled || null,
+      onclick: disabled ? null : onClick
+    }, label, !disabled ? svgIcon(ICONS.chevronRight, 16) : null);
+  }
+
+  function BackBtn(onClick) {
+    return el('button', {
+      class: 'btn-back', type: 'button', onclick: onClick,
+      'aria-label': 'Étape précédente'
+    },
+      svgIcon(ICONS.chevronLeft, 15),
+      'Étape précédente'
+    );
+  }
+
+  /* Indicateur d'étapes (1-4 visibles, "Activité / CA / Net / Bilan") */
+  function StepIndicator(current, total = 4) {
+    const labels = ['Activité', 'Revenu imposable', 'Bénéfice réel', 'Bilan'];
+    const wrap = el('div', { class: 'steps', role: 'progressbar',
+      'aria-valuemin': '1', 'aria-valuemax': String(total),
+      'aria-valuenow': String(current),
+      'aria-label': `Étape ${current} sur ${total} : ${labels[current - 1]}` });
+    for (let i = 0; i < total; i++) {
+      const step = i + 1;
+      const status = step < current ? 'done' : step === current ? 'active' : 'todo';
+      const item = el('div', { class: 'steps__item' });
+      const btn = el('button', {
+        class: 'steps__bullet',
+        type: 'button',
+        dataset: { state: status },
+        'aria-label': status === 'done'
+          ? `Revenir à l'étape ${step} : ${labels[i]}`
+          : `Étape ${step} : ${labels[i]}`,
+        ...(status === 'done' ? { onclick: () => goTo(step) } : {})
+      });
+      btn.appendChild(status === 'done'
+        ? svgIcon(ICONS.check, 14)
+        : document.createTextNode(String(step)));
+      const lbl = el('span', { class: 'steps__label', dataset: { state: status } }, labels[i]);
+      item.appendChild(btn);
+      item.appendChild(lbl);
+      wrap.appendChild(item);
+      if (i < total - 1) {
+        wrap.appendChild(el('div', {
+          class: 'steps__bar',
+          dataset: { state: step < current ? 'done' : 'todo' }
+        }));
+      }
+    }
+    return wrap;
+  }
+
+  /* ────────────────────────────────────────────────────────────────
+     6. ÉTAPES (rendu + interactions)
+     ──────────────────────────────────────────────────────────────── */
+
+  /* Step 0 — Accueil ─────────────────────────────────────────────── */
+  function renderStep0() {
+    return el('div', { class: 'step-enter' },
+      el('div', { class: 'lede' },
+        el('h2', null, 'Vous envisagez de créer une micro-entreprise ?'),
+      ),
+      el('div', { class: 'copy' },
+        el('p', { html: 'La micro-entreprise est séduisante par sa simplicité. <br>Mais elle peut cacher un piège : sous-estimer les <strong>charges</strong> et l&#39<strong>impact sur ses impôts</strong>.' }),
+        el('p', { html: '<strong>MicroFisca</strong>&nbsp; permet de voir si vous risquez de payer des impôts sur de l&#39argent que vous n&#39avez pas gagné</strong>.' }),
+        el('p', { html: 'Cet outil est : <br>✅ &nbsp; 100% <strong>Gratuit</strong><br> ✅ &nbsp; <strong>Rapide</strong> (moins de 5 minutes) <br> ✅ &nbsp; <strong>Confidentiel</strong> (zéro donnée transmise).' })
+      ),
+      el('button', {
+        class: 'btn-cta', type: 'button',
+        onclick: () => setState({ step: 1, prevStep: 0 })
+      },
+        'Faire le test maintenant',
+        svgIcon(ICONS.chevronRight, 18)
+      )
+    );
+  }
+
+  /* Step 1 — Choix du régime ─────────────────────────────────────── */
+  function renderStep1() {
+    const root = el('div', { class: 'step-enter' });
+
+    root.appendChild(el('div', { class: 'section-head' },
+      el('h2', null, 'Quelle est votre activité ?'),
+      el('p', { html: 'En micro-entreprise, le régime fiscal varie selon la nature de l’activité. Chaque régime applique un <strong>abattement forfaitaire</strong> différent à votre CA pour calculer votre revenu imposable.' })
+    ));
+
+    const list = el('div', { class: 'regime-list', role: 'radiogroup',
+      'aria-label': 'Choisir un régime fiscal' });
+
+    Object.entries(REGIMES).forEach(([key, reg]) => {
+      const active = state.regime === key;
+      const btn = el('button', {
+        class: 'regime', type: 'button', role: 'radio',
+        'aria-checked': active ? 'true' : 'false',
+        'aria-pressed': active ? 'true' : 'false',
+        onclick: () => setState({ regime: key })
+      },
+        el('div', { class: 'regime__head' },
+          el('div', { class: 'regime__radio', 'aria-hidden': 'true' }),
+          el('span', { class: 'regime__name' }, reg.nom),
+          el('span', { class: 'regime__tag' }, reg.tag)
+        ),
+        el('p', { class: 'regime__desc' }, reg.desc),
+        el('div', { class: 'regime__meta' },
+          el('span', { class: 'regime__chip regime__chip--abat' },
+            'Abattement ' + fmtPct(reg.abattement)),
+          el('span', { class: 'regime__chip regime__chip--cot' },
+            'Cotisations ' + fmtPct(reg.cotisations))
+        )
+      );
+      list.appendChild(btn);
+    });
+    root.appendChild(list);
+
+    root.appendChild(InfoBox({
+      tone: 'yellow', icon: '📌',
+      html: '<strong>BNC</strong>&nbsp;(Bénéfices Non Commerciaux) : pour les activités <strong>intellectuelles ou libérales.</strong><br><strong>BIC</strong>&nbsp;(Bénéfices Industriels et Commerciaux) : pour les activités <strong>manuelles, artisanales ou commerciales.</strong>'
+    }));
+
+    root.appendChild(InfoBox({
+      tone: 'orange', icon: '⚠️',
+      html: 'Pour les activités de services, le mauvais régime peut faire varier le revenu imposable de plusieurs milliers d’euros.'
+    }));
+
+    root.appendChild(el('div', { class: 'nav nav--end' },
+      PrimaryBtn('Étape suivante', next, { disabled: !state.regime })
+    ));
+
+    return root;
+  }
+
+  /* Step 2 — CA + abattement ─────────────────────────────────────── */
+  function renderStep2() {
+    const root = el('div', { class: 'step-enter' });
+
+    root.appendChild(el('div', { class: 'section-head' },
+      el('h2', null, 'Quel est votre chiffre d’affaires annuel ?'),
+      el('p', { html: 'Indiquez votre CA, prévisionnel ou réel, pour déterminer votre <strong>revenu imposable</strong>&nbsp;(le montant soumis à l&#39impôt sur le revenu).' })
+    ));
+
+    // Card avec input + zone calculée dynamique
+    const computedArea = el('div');
+    const card = Card([
+      // Ligne d'input CA
+      (() => {
+        const input = el('input', {
+          class: 'num-input__field',
+          type: 'number', min: 0, max: 1e9, step: '100',
+          placeholder: '0', inputmode: 'numeric',
+          'aria-label': 'Chiffre d’affaires annuel en euros',
+          value: state.ca === '' ? '' : String(state.ca)
+        });
+        input.addEventListener('input', (e) => {
+          if (e.target.value === '') {
+            state.ca = '';
+          } else {
+            state.ca = safeNum(e.target.value);
+            // Resynchronisation si la saisie a été clampée
+            if (String(state.ca) !== e.target.value && !e.target.value.endsWith('.')) {
+              e.target.value = state.ca;
+            }
+          }
+          refreshComputed();
+          refreshAlert();
+          syncNextDisabled();
+        });
+
+        return el('div', { class: 'inline-row' },
+          el('span', { class: 'inline-row__label' }, 'Chiffre d’affaires annuel'),
+          el('div', { class: 'num-input' },
+            input,
+            el('span', { class: 'num-input__suffix' }, '€')
+          )
+        );
+      })(),
+      computedArea
+    ]);
+    root.appendChild(card);
+
+    const alertArea = el('div');
+    root.appendChild(alertArea);
+
+    // Zone rendue dynamiquement (sans re-render complet) :
+    function refreshComputed() {
+      computedArea.innerHTML = '';
+      const ca = typeof state.ca === 'number' ? state.ca : 0;
+      if (ca > 0 && state.regime) {
+        const d = computeAll(state.regime, ca, 0);
+        computedArea.appendChild(CalcRow({
+          label: 'Abattement forfaitaire',
+          badge: fmtPct(REGIMES[state.regime].abattement),
+          value: '− ' + fmtEUR(d.abattement),
+          valueColor: 'muted'
+        }));
+        computedArea.appendChild(CalcRow({
+          label: 'Revenu imposable',
+          value: '= ' + fmtEUR(d.revenusImposables),
+          valueColor: 'accent',
+          highlight: true,
+          size: 'lg'
+        }));
+      }
+    }
+
+    function refreshAlert() {
+      alertArea.innerHTML = '';
+      const ca = typeof state.ca === 'number' ? state.ca : 0;
+      if (ca > 0 && state.regime) {
+        const d = computeAll(state.regime, ca, 0);
+        alertArea.appendChild(InfoBox({
+          tone: 'yellow', icon: '📌',
+          html: `<strong>Ce que ça signifie :</strong> en micro-entreprise, vous êtes imposé sur <strong>${fmtEUR(d.revenusImposables)}</strong>, pas sur votre bénéfice réel. L’abattement de ${fmtPct(REGIMES[state.regime].abattement)} est censé représenter vos frais professionnels.`
+        }));
+
+        // Alerte de dépassement de seuil micro-entreprise (2026)
+        const seuil = SEUILS_CA[state.regime];
+        if (ca > seuil) {
+          alertArea.appendChild(InfoBox({
+            tone: 'orange', icon: '⚠️',
+            html: `<strong>Attention : seuil micro-entreprise dépassé.</strong> Pour le régime <strong>${REGIMES[state.regime].tag} ${REGIMES[state.regime].nom.toLowerCase()}</strong>, le plafond de chiffre d’affaires en 2026 est de <strong>${fmtEUR(seuil)}</strong>. Au-delà (et après deux années consécutives), vous basculez automatiquement au régime réel. La simulation reste indicative mais le régime micro ne sera plus applicable.`
+          }));
+        } else if (seuil - ca < seuil * 0.10) {
+          // Alerte douce à moins de 10% du plafond
+          alertArea.appendChild(InfoBox({
+            tone: 'neutral', icon: 'ℹ️',
+            html: `Vous approchez du plafond du régime ${REGIMES[state.regime].tag} (${fmtEUR(seuil)} en 2026). Pensez à anticiper.`
+          }));
+        }
+      }
+    }
+
+    refreshComputed();
+    refreshAlert();
+
+    // Nav
+    const nextBtn = PrimaryBtn('Étape suivante', next, {
+      disabled: !(typeof state.ca === 'number' && state.ca > 0)
+    });
+    function syncNextDisabled() {
+      const ok = typeof state.ca === 'number' && state.ca > 0;
+      nextBtn.disabled = !ok;
+      // Ré-attache le handler si on l'a perdu via disabled
+      nextBtn.onclick = ok ? next : null;
+      // Re-créer l'icône chevron si besoin
+      if (ok && !nextBtn.querySelector('svg')) {
+        nextBtn.appendChild(svgIcon(ICONS.chevronRight, 16));
+      }
+      if (!ok) {
+        const svg = nextBtn.querySelector('svg');
+        if (svg) svg.remove();
+      }
+    }
+
+    root.appendChild(el('div', { class: 'nav' },
+      BackBtn(back),
+      nextBtn
+    ));
+
+    return root;
+  }
+
+  /* Step 3 — Charges + bénéfice réel ──────────────────────────────── */
+  function renderStep3() {
+    const root = el('div', { class: 'step-enter' });
+    const ca = typeof state.ca === 'number' ? state.ca : 0;
+    const reg = REGIMES[state.regime];
+
+    if (!reg || ca <= 0) {
+      // Garde-fou : si on tombe ici sans données valides
+      goTo(1);
+      return root;
+    }
+
+    root.appendChild(el('div', { class: 'section-head' },
+      el('h2', null, 'Quelles sont vos charges annuelles réelles ?'),
+      el('p', { html: 'Renseignez toutes vos charges annuelles (hors cotisations sociales), pour calculer votre <strong>bénéfice réel</strong>.' })
+    ));
+
+    const cotisations = ca * reg.cotisations;
+    const netRow = el('div'); // ligne de résultat dynamique
+
+    const chargesInput = el('input', {
+      class: 'num-input__field',
+      type: 'number', min: 0, max: 1e9, step: '100',
+      placeholder: '0', inputmode: 'numeric',
+      'aria-label': 'Charges réelles annuelles en euros',
+      value: state.charges === '' ? '' : String(state.charges)
+    });
+
+    function refreshNet() {
+      netRow.innerHTML = '';
+      const ch = typeof state.charges === 'number' ? state.charges : 0;
+      const d = computeAll(state.regime, ca, ch);
+      const negative = d.netReel < 0;
+      netRow.appendChild(CalcRow({
+        label: 'Bénéfice réel',
+        value: '= ' + fmtEUR(Math.max(0, d.netReel)),
+        valueColor: negative ? 'error' : 'accent',
+        highlight: true, size: 'lg'
+      }));
+    }
+
+    chargesInput.addEventListener('input', (e) => {
+      if (e.target.value === '') {
+        state.charges = '';
+      } else {
+        state.charges = safeNum(e.target.value);
+        if (String(state.charges) !== e.target.value && !e.target.value.endsWith('.')) {
+          e.target.value = state.charges;
+        }
+      }
+      refreshNet();
+    });
+
+    const card = Card([
+      CalcRow({ label: 'Chiffre d’affaires annuel', value: fmtEUR(ca) }),
+      CalcRow({
+        label: 'Cotisations sociales',
+        badge: fmtPct(reg.cotisations),
+        value: '− ' + fmtEUR(cotisations),
+        valueColor: 'muted'
+      }),
+      el('div', { class: 'inline-row', dataset: { align: 'top' } },
+        el('div', { style: { flex: '1' } },
+          el('div', { class: 'inline-row__label' }, 'Autres charges annuelles'),
+          el('div', { class: 'inline-row__sub' },
+            'Logiciels, matériel, déplacements, téléphone, formation…')
+        ),
+        el('div', { class: 'num-input', style: { paddingTop: '2px' } },
+          el('span', { class: 'num-input__minus' }, '−'),
+          chargesInput,
+          el('span', { class: 'num-input__suffix' }, '€')
+        )
+      ),
+      netRow
+    ]);
+    root.appendChild(card);
+    refreshNet();
+
+    root.appendChild(InfoBox({
+      tone: 'yellow', icon: '📌',
+      html: '<strong>Le mythe du « pas de CA, pas de frais » :</strong> même sans chiffre d’affaires, votre activité peut engendrer des frais (abonnements logiciels, frais de déplacement,...). En micro-entreprise, ces charges réelles ne sont <em>jamais</em> déductibles. Elles sont à prendre en compte pour évaluer la pertinence de ce statut.'
+    }));
+
+    root.appendChild(el('div', { class: 'nav' },
+      BackBtn(back),
+      PrimaryBtn('Étape suivante', next)
+    ));
+
+    return root;
+  }
+
+  /* Step 4 — Verdict / bilan ─────────────────────────────────────── */
+  function renderStep4() {
+    const root = el('div', { class: 'step-enter' });
+    const ca = typeof state.ca === 'number' ? state.ca : 0;
+    const charges = typeof state.charges === 'number' ? state.charges : 0;
+    const reg = REGIMES[state.regime];
+
+    if (!reg || ca <= 0) {
+      goTo(1);
+      return root;
+    }
+
+    const d = computeAll(state.regime, ca, charges);
+
+    // ─── 1. Récapitulatif ───
+    root.appendChild(el('div', { class: 'section-head' },
+      el('h2', null, 'Récapitulatif'),
+      el('p', null, 'Vue d’ensemble de vos informations.')
+    ));
+    root.appendChild(Card([
+      // Activité
+      el('div', { class: 'recap-stripe' },
+        el('span', { class: 'recap-stripe__eyebrow' }, 'Activité'),
+        el('div', { class: 'recap-stripe__activity' },
+          el('span', null, reg.nom),
+          el('span', { class: 'calc-row__badge' }, reg.tag)
+        )
+      ),
+      // Base fiscale
+      el('div', { class: 'recap-stripe', dataset: { tone: 'accent' } },
+        el('span', { class: 'recap-stripe__eyebrow' }, 'Base fiscale')
+      ),
+      CalcRow({ label: 'Chiffre d’affaires', value: fmtEUR(ca) }),
+      CalcRow({
+        label: 'Abattement forfaitaire',
+        badge: fmtPct(reg.abattement),
+        value: '− ' + fmtEUR(d.abattement),
+        valueColor: 'muted'
+      }),
+      CalcRow({
+        label: 'Revenu imposable',
+        value: '= ' + fmtEUR(d.revenusImposables),
+        valueColor: 'accent', highlight: true, size: 'lg'
+      }),
+      // Charges et net
+      el('div', { class: 'recap-stripe', dataset: { tone: 'primary' } },
+        el('span', { class: 'recap-stripe__eyebrow' }, 'Charges et bénéfice réels')
+      ),
+      CalcRow({
+        label: 'Cotisations sociales',
+        badge: fmtPct(reg.cotisations),
+        value: '− ' + fmtEUR(d.cotisations),
+        valueColor: 'muted'
+      }),
+      CalcRow({
+        label: 'Autres charges',
+        value: charges > 0 ? '− ' + fmtEUR(charges) : '—',
+        valueColor: 'muted'
+      }),
+      CalcRow({
+        label: 'Bénéfice réel',
+        value: fmtEUR(Math.max(0, d.netReel)),
+        highlight: true, labelInk: true, size: 'lg'
+      })
+    ], 'card--recap'));
+
+    // Alerte seuil sur le verdict aussi (rappel)
+    if (ca > SEUILS_CA[state.regime]) {
+      root.appendChild(InfoBox({
+        tone: 'orange', icon: '⚠️',
+        html: `<strong>Plafond micro dépassé :</strong> votre CA (${fmtEUR(ca)}) excède le seuil ${reg.tag} de ${fmtEUR(SEUILS_CA[state.regime])} pour 2026. Le régime micro n’est pas durable à ce niveau.`
+      }));
+    }
+
+    // ─── 2. Analyse express ───
+    root.appendChild(el('div', { class: 'section-head', style: { marginTop: '28px' } },
+      el('h2', null, 'Analyse express'),
+      el('p', null, 'Le résultat du régime micro-fiscal appliqué à cette entreprise.')
+    ));
+    root.appendChild(renderAnalyseExpress({
+      revenusImposables: d.revenusImposables,
+      netReel: d.netReel,
+      caNum: ca,
+      regimeNom: reg.nom.toLowerCase(),
+      threshold: thresholdPct(state.regime)
+    }));
+
+    // ─── 3. Avertissement ───
+    const warn = InfoBox({
+      tone: 'orange', icon: '⚠️',
+      html: '<strong>ATTENTION :</strong> cette analyse simplifiée a pour but d&#39aider à comprendre le régime micro-fiscal avec des exemples chiffrés.<strong>&nbsp;Ce n&#39est pas un conseil personnalisé permettant de décider de la pertinence de la micro-entreprise dans votre cas.</strong>&nbsp;<br>Pour une analyse fiscale complète adaptée à votre situation, d&#39autres éléments sont à prendre en compte et à voir avec un(e) expert-comptable ou un(e) fiscaliste.'
+    });
+    const warnExtra = el('div', { style: { marginTop: '6px' } },
+      el('button', {
+        class: 'btn-link-inline', type: 'button',
+        onclick: () => goTo(5)
+      },
+        'En savoir plus',
+        svgIcon(ICONS.chevronRight, 11)
+      )
+    );
+    warn.querySelector('div').appendChild(warnExtra);
+    warn.style.marginTop = '24px';
+    root.appendChild(warn);
+
+    // ─── Nav ───
+    root.appendChild(el('div', { class: 'nav' },
+      BackBtn(back),
+      el('button', { class: 'btn-restart', type: 'button', onclick: restart },
+        svgIcon(ICONS.restart, 13),
+        'Recommencer'
+      )
+    ));
+
+    return root;
+  }
+
+  function renderAnalyseExpress({ revenusImposables, netReel, caNum, regimeNom, threshold }) {
+    const net = Math.max(0, netReel);
+    const diff = revenusImposables - net;
+
+    let tone, label, diffLabel;
+    if (diff <= 0) {
+      tone = 'success';
+      label = net === revenusImposables
+        ? 'À l’équilibre'
+        : 'Schéma gagnant';
+      diffLabel = diff < 0
+        ? `${fmtEUR(Math.abs(diff))} gagnés non imposables`
+        : 'Ràs';
+    } else if (diff <= caNum * 0.05) {
+      tone = 'warn';
+      label = 'Pas optimal (pas grave si petit montant)';
+      diffLabel = `${fmtEUR(diff)} non gagnés mais imposables`;
+    } else {
+      tone = 'error';
+      label = 'Statut à revoir potentiellement si CA élevé';
+      diffLabel = `${fmtEUR(diff)} non gagnés mais imposables`;
+    }
+
+    const CHART_H = 220;
+    const LABEL_H = 52;
+    const maxVal = Math.max(revenusImposables, net, 1) * 1.15;
+    const hImpos = Math.round(revenusImposables / maxVal * CHART_H);
+    const hNet = Math.round(net / maxVal * CHART_H);
+
+    const card = el('div', { class: 'card' });
+    const inner = el('div', { class: 'verdict', dataset: { tone } });
+
+    // Status row
+    inner.appendChild(el('div', { class: 'verdict__status' },
+      el('div', { class: 'verdict__label' },
+        el('div', { class: 'verdict__dot' }),
+        el('span', null, label)
+      ),
+      el('span', { class: 'verdict__diff' }, diffLabel)
+    ));
+
+    // Chart
+    const chartH = CHART_H + LABEL_H;
+    const chart = el('div', { class: 'chart', style: { height: chartH + 'px' } });
+    // refline et baseline sont positionnées après render via getBoundingClientRect (voir plus bas)
+    const refline = el('div', { class: 'chart__refline' });
+    chart.appendChild(refline);
+    const barAccent = el('div', {
+      class: 'chart__bar chart__bar--accent',
+      style: { height: hImpos + 'px' }
+    });
+    const bars = el('div', {
+      class: 'chart__bars',
+      style: { height: '100%' }
+    },
+      // Bar imposables
+      el('div', { class: 'chart__col' },
+        el('span', { class: 'chart__amount chart__amount--accent' },
+          fmtEUR(revenusImposables)),
+        barAccent,
+        el('div', { class: 'chart__caption' },
+          el('div', { class: 'chart__caption-title chart__caption-title--accent' },
+            'Revenu imposable'),
+          el('div', { class: 'chart__caption-sub' }, 'base fiscale')
+        )
+      ),
+      // Bar net
+      el('div', { class: 'chart__col' },
+        el('span', { class: 'chart__amount chart__amount--ink' }, fmtEUR(net)),
+        el('div', {
+          class: 'chart__bar chart__bar--primary',
+          style: { height: Math.max(hNet, 4) + 'px' }
+        }),
+        el('div', { class: 'chart__caption' },
+          el('div', { class: 'chart__caption-title' }, 'Bénéfice réel'),
+          el('div', { class: 'chart__caption-sub' }, 'avant impôt')
+        )
+      )
+    );
+    chart.appendChild(bars);
+    const baseline = el('div', { class: 'chart__baseline' });
+    chart.appendChild(baseline);
+    inner.appendChild(chart);
+
+    // Alignement précis après render : refline au sommet de la barre bordeaux,
+    // baseline à la base réelle des barres (le « zéro » du graphique).
+    function alignChartLines() {
+      const chartRect = chart.getBoundingClientRect();
+      const barRect = barAccent.getBoundingClientRect();
+      if (chartRect.height === 0) return; // pas encore visible
+      // -1 pour centrer le trait pointillé 2px sur le sommet de la barre
+      refline.style.bottom = (chartRect.bottom - barRect.top - 1) + 'px';
+      baseline.style.bottom = (chartRect.bottom - barRect.bottom) + 'px';
+    }
+    requestAnimationFrame(alignChartLines);
+    // Recalage automatique si le graphique est redimensionné (responsive).
+    // Le ResizeObserver est détruit avec le nœud, donc pas de fuite mémoire.
+    if (typeof ResizeObserver !== 'undefined') {
+      const ro = new ResizeObserver(alignChartLines);
+      ro.observe(chart);
+    }
+
+    // Copy
+    const copy = el('div', { class: 'verdict__copy' },
+      el('p', { html: 'Le régime micro-fiscal est intéressant lorsque le <strong>bénéfice réel &gt; revenus imposables</strong>.' }),
+      el('p', {
+        html: `Pour une activité de type "<strong class="weak">${regimeNom}</strong>", cela implique que vos charges réelles (hors cotisations) ne dépassent pas <strong>${threshold} %</strong> de votre chiffre d’affaires.`
+      })
+    );
+    inner.appendChild(copy);
+
+    card.appendChild(inner);
+    return card;
+  }
+
+  /* Step 5 — À propos  ────────────────────────────────── */
+  function renderStep5() {
+    const root = el('div', { class: 'step-enter' });
+
+    // Titre principal
+    root.appendChild(el('div', { class: 'lede' },
+      el('h2', null, 'À propos de MicroFisca')
+    ));
+
+    // ─── Section 1 : Qu'est-ce que MicroFisca ? ───
+    root.appendChild(el('section', { class: 'about-section' },
+      el('h3', null, 'Qu’est-ce que MicroFisca ?'),
+      el('p', { html: 'MicroFisca est un outil pédagogique destiné aux <strong>porteurs de projet, freelances et indépendants</strong> qui envisagent de créer une micro-entreprise, ou qui s’interrogent sur la pertinence de leur statut actuel.' }),
+      el('p', { html: 'Il répond à une question simple : <strong>vos charges réelles sont-elles bien couvertes par l’abattement forfaitaire du régime de la micro-entreprise ?</strong>' }),
+      el('p', { html: 'En micro-entreprise, l’État applique un pourcentage fixe pour estimer les frais professionnels (34 %, 50 % ou 71 % selon l’activité). Si les dépenses réelles dépassent ce forfait, il y a un risque de payer des impôts sur de l’argent non gagné. C’est ce que MicroFisca rend visible, chiffres à l’appui, en moins de 5 minutes.' })
+    ));
+
+    // ─── Section 2 : Limites ───
+    const section2 = el('section', { class: 'about-section' },
+      el('h3', null, 'Les limites de MicroFisca'),
+      el('p', null, 'Cette simulation est volontairement simplifiée pour rester pédagogique et accessible. Elle ne prend pas en compte par exemple :'),
+      el('ul', { class: 'about-list' },
+        el('li', { html: 'Le <strong>taux marginal d’imposition</strong> (TMI), qui détermine l’impôt sur le revenu effectivement payé selon le foyer fiscal ;' }),
+        el('li', { html: 'Les <strong>avantages spécifiques</strong> comme l&#39ACRE, l&#39exonération de TVA ou le versement libératoire.' })
+      )
+    );
+    section2.appendChild(InfoBox({
+      tone: 'orange', icon: '⚠️',
+      html: '<strong>Important :</strong> MicroFisca est un outil de sensibilisation, pas un conseil personnalisé. Pour une décision engageante (création, changement de statut, optimisation fiscale), consultez un(e) expert-comptable ou un(e) fiscaliste.'
+    }));
+    root.appendChild(section2);
+
+    // ─── Section 3 : Sources ───
+    root.appendChild(el('section', { class: 'about-section' },
+      el('h3', null, 'Sources et mises à jour'),
+      el('p', null, 'Les taux et plafonds utilisés proviennent des sources officielles :'),
+      el('ul', { class: 'about-list' },
+        el('li', { html: '<strong>Abattements forfaitaires</strong> : Code général des impôts (art. 50-0 et 102 ter)' }),
+        el('li', { html: '<strong>Cotisations sociales</strong> : barème URSSAF 2026' }),
+        el('li', { html: '<strong>Plafonds de chiffre d’affaires</strong> : Service-Public.fr' })
+      ),
+      el('p', { html: `<strong>Dernière mise à jour : </strong>${DERNIERE_MAJ}.` }),
+      el('p', { html: '<strong>ATTENTION</strong> : Les barèmes URSSAF peuvent évoluer chaque année.' })
+    ));
+	
+
+    // Carte feedback
+    const feedback = Card(
+      el('div', { class: 'feedback-card' },
+        el('div', { class: 'feedback-card__icon' },
+          svgIcon('<svg viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.5.5.8 1.1 1 1.8l.1.5h5.8l.1-.5c.2-.7.5-1.3 1-1.8A7 7 0 0 0 12 2z"/></svg>', 32)
+        ),
+        el('h3', { class: 'feedback-card__title' }, 'Votre avis compte'),
+        el('p', { class: 'feedback-card__desc' },
+          'Vous avez aimé cet outil ? Vous avez des questions ou des idées pour améliorer MicroFisca ? Vos retours précieux sont bienvenus.'),
+        el('a', {
+          class: 'feedback-card__btn',
+          href: 'https://tally.so/r/Pd24xQ',
+          target: '_blank', rel: 'noopener noreferrer'
+        },
+          svgIcon(ICONS.edit, 15),
+          'Partager un feedback'
+        )
+      )
+    );
+    feedback.style.marginBottom = '32px';
+    root.appendChild(feedback);
+
+    if (state.prevStep === 4) {
+      root.appendChild(el('button', {
+        class: 'btn-back', type: 'button', onclick: () => goTo(4)
+      },
+        svgIcon(ICONS.chevronLeft, 15),
+        'Retour au bilan'
+      ));
+    }
+
+    return root;
+  }
+
+  /* ────────────────────────────────────────────────────────────────
+     7. RENDU PRINCIPAL
+     ──────────────────────────────────────────────────────────────── */
+
+  function renderHeader() {
+    return el('button', {
+      class: 'header', type: 'button', onclick: home,
+      title: 'Retour à l’accueil',
+      'aria-label': 'MicroFisca — retour à l’accueil'
+    },
+      el('div', { class: 'header__mark', 'aria-hidden': 'true' },
+        svgIcon(ICONS.piggy, 24)
+      ),
+      el('div', null,
+        el('h1', { class: 'header__title', html: 'Micro<em>Fisca</em>' }),
+        el('p', { class: 'header__tagline' },
+          'Comprendre la fiscalité de la micro-entreprise en 5 minutes')
+      )
+    );
+  }
+
+  function renderFooter() {
+    return el('footer', { class: 'footer' },
+      el('span', null,
+        'Créé par ',
+        el('a', {
+          href: 'https://www.linkedin.com/in/connectsophierakotobe/',
+          target: '_blank',
+          rel: 'noopener noreferrer',
+          class: 'footer__author'
+        }, 'Sophie RAKOTOBE'),
+        ' - 2026'
+      ),
+      el('div', { class: 'footer__nav' },
+        el('button', { class: 'footer__link', type: 'button', onclick: home }, 'Accueil'),
+        el('span', { class: 'footer__sep' }, '·'),
+        el('button', {
+          class: 'footer__link', type: 'button',
+          onclick: () => goTo(5)
+        }, 'À propos')
+      )
+    );
+  }
+
+  const STEP_RENDERERS = [
+    renderStep0, renderStep1, renderStep2, renderStep3, renderStep4, renderStep5
+  ];
+
+  // Trace le step réellement affiché à l'écran (indépendant de state.prevStep
+  // qui n'est pas synchronisé sur tous les setState).
+  let __lastRenderedStep = null;
+
+  function render() {
+    const app = document.getElementById('app');
+
+    const stepChanged = __lastRenderedStep !== state.step && __lastRenderedStep !== null;
+    const sameStep = __lastRenderedStep === state.step;
+
+    // Construire le nouveau DOM hors-écran dans un fragment.
+    // Ainsi, l'utilisateur ne voit jamais de page vide entre l'ancien et le nouveau contenu,
+    // et la position de scroll est naturellement préservée.
+    const fragment = document.createDocumentFragment();
+    const container = el('div', { class: 'container' });
+    container.appendChild(renderHeader());
+
+    if (state.step >= 1 && state.step <= 4) {
+      container.appendChild(StepIndicator(state.step, 4));
+    }
+
+    const stepContent = STEP_RENDERERS[state.step]();
+    // Si on reste dans la même étape (ex: sélection régime, mise à jour interne),
+    // on désactive l'animation d'entrée pour éviter un effet visuel indésirable.
+    if (sameStep) {
+      stepContent.classList.remove('step-enter');
+    }
+    container.appendChild(stepContent);
+
+    fragment.appendChild(container);
+    fragment.appendChild(renderFooter());
+
+    // Swap atomique : on remplace tout d'un coup, sans passer par un état "page vide".
+    app.replaceChildren(fragment);
+
+    // Sur vrai changement d'étape, on remonte en haut.
+    // Sur re-render dans la même étape, on ne fait rien : le scroll reste où il était.
+    if (stepChanged) {
+      window.scrollTo(0, 0);
+    }
+
+    __lastRenderedStep = state.step;
+
+    // Focus management : sur changement d'étape, ramener le focus en haut du contenu (a11y)
+    const heading = container.querySelector('h2, h1');
+    if (heading && state.prevStep !== null && state.prevStep !== state.step) {
+      heading.setAttribute('tabindex', '-1');
+      requestAnimationFrame(() => heading.focus({ preventScroll: true }));
+    }
+  }
+
+  // Démarrage
+  render();
+  </script>
+</body>
+</html>

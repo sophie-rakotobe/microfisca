@@ -7,10 +7,9 @@
   <meta name="color-scheme" content="light">
   <meta name="robots" content="noindex, nofollow" />
   <meta name="googlebot" content="noindex">
-  <title>MicroFisca — Simulateur Express</title>
+  <title>MicroFisca - Simulateur Express</title>
   <!-- Favicon standard -->
-  <link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
-	
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -54,6 +53,7 @@
       --font-text: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
       --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
+      --shadow-xs: 0 1px 2px oklch(0% 0 0 / 0.04);
       --shadow-sm: 0 1px 4px oklch(0% 0 0 / 0.05);
       --shadow-md: 0 2px 12px oklch(0% 0 0 / 0.08);
       --shadow-lg: 0 2px 8px oklch(0% 0 0 / 0.15);
@@ -244,10 +244,12 @@
       color: var(--ink);
     }
     .calc-row__head {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      min-width: 0;
+	  display: flex;
+	  flex-direction: row;
+	  align-items: center;
+	  flex-wrap: wrap;
+	  gap: 6px;
+	  min-width: 0;
     }
     .calc-row__label {
       font-size: 13px;
@@ -263,6 +265,7 @@
       border-radius: var(--radius-pill);
       background: var(--primary);
       color: var(--ink);
+	  flex-shrink: 0;
     }
     .calc-row__value {
       font-family: var(--font-mono);
@@ -295,8 +298,8 @@
       margin-top: 1px;
     }
     .info[data-tone="yellow"] {
-      background: var(--primary-tint);
-      border-color: var(--primary-edge);
+      background: rgba(250, 204, 21, 0.17);
+      border-color: rgba(250, 204, 21, 0.50);
       color: var(--accent);
     }
     .info[data-tone="orange"] {
@@ -315,6 +318,13 @@
       color: var(--error-content);
     }
     .info strong { font-weight: 700; }
+    .info__link {
+      color: var(--accent);
+      font-weight: 700;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      transition: color 150ms;
+    }
 
     /* Section titres pour le verdict */
     .section-head { margin-bottom: 20px; }
@@ -344,7 +354,6 @@
     .recap-stripe[data-tone="primary"] {
       padding: 7px 20px;
       background: rgba(250, 204, 21, 0.15);
-      border-top: 2px solid var(--border);
     }
     .recap-stripe__eyebrow {
       font-size: 11px;
@@ -358,6 +367,24 @@
     .recap-stripe__activity {
       display: flex; align-items: center; gap: 8px;
       font-size: 13px; font-weight: 600; color: var(--ink);
+    }
+    /* Récap hiérarchique : catégorie parente + sous-option */
+    .recap-stripe[data-tone="stack"] {
+      align-items: flex-start;
+      padding: 12px 20px;
+    }
+    .recap-stripe__stack {
+      display: flex; flex-direction: column; gap: 4px;
+      flex: 1;
+    }
+    .recap-stripe__parent {
+      font-size: 13px; font-weight: 700; color: var(--ink);
+      line-height: 1.35;
+    }
+    .recap-stripe__child {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+      font-size: 12px; font-weight: 500; color: var(--muted);
+      line-height: 1.4;
     }
 
     /* ─── Inputs numériques ──────────────────────────────────────── */
@@ -441,6 +468,7 @@
       color: var(--muted);
       cursor: not-allowed;
     }
+    .btn-primary:disabled svg { display: none; }
 
     .btn-cta {
       width: 100%;
@@ -507,7 +535,9 @@
       padding: 0;
       cursor: pointer;
     }
-    .btn-link-inline:hover { text-decoration: underline; text-underline-offset: 2px; }
+    .btn-link-inline { text-decoration: underline; text-underline-offset: 2px; }
+    .info a:hover { color: inherit !important; }
+    .btn-link-inline:hover { text-decoration: underline; text-underline-offset: 2px; color: var(--warn-content); }
 
     .nav {
       display: flex;
@@ -521,53 +551,199 @@
     .regime-list {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
       margin-bottom: 20px;
     }
     .regime {
       padding: 18px 20px;
       border-radius: var(--radius-btn-lg);
       text-align: left;
-      border: 1.5px solid var(--border);
+      border: 1px solid var(--border);
       background: var(--card);
       cursor: pointer;
-      transition: border-color 150ms, box-shadow 150ms, transform 150ms var(--ease);
+      transition: border-color 150ms, box-shadow 150ms, transform 150ms var(--ease), background 150ms;
       width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: var(--shadow-xs);
     }
-    .regime:hover { transform: translateY(-1px); }
+    .regime:hover {
+      transform: translateY(-1px);
+      border-color: var(--border-strong);
+      box-shadow: var(--shadow-sm);
+    }
     .regime[aria-pressed="true"] {
-      border: 2px solid var(--ink);
+      border-color: var(--ink);
       box-shadow: var(--shadow-md);
     }
-    .regime__head {
-      display: flex; align-items: center; gap: 10px; margin-bottom: 6px;
+    .regime__icon {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      background: var(--neutral-tint);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      color: var(--ink);
+      transition: background 150ms, color 150ms;
     }
-    .regime__radio {
-      width: 20px; height: 20px;
+    .regime[aria-pressed="true"] .regime__icon {
+      background: var(--primary);
+      color: var(--ink);
+    }
+    .regime__icon svg { width: 20px; height: 20px; stroke-width: 1.8; }
+    .regime__stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      margin-left: 34px;
+      margin-right: 34px;
+      border-top: 1px solid var(--border);
+      padding-top: 12px;
+    }
+    .regime[aria-pressed="true"] .regime__stats { border-top-color: var(--border); }
+    .regime__stat {
+      display: flex; flex-direction: column; gap: 2px;
+      padding: 0 2px;
+    }
+    .regime__stat + .regime__stat {
+      border-left: 1px solid var(--border);
+      padding-left: 14px;
+    }
+    .regime[aria-pressed="true"] .regime__stat + .regime__stat {
+      border-left-color: var(--border-strong);
+    }
+    .regime__stat-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .regime__stat-value {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .regime__stat--abat .regime__stat-value { color: var(--accent); }
+    .regime__sub-hint {
+      margin-left: 34px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .regime__sub-hint svg { width: 12px; height: 12px; stroke-width: 2.2; }
+    /* Quand une sous-question est ouverte, on retire le radius bas */
+    .regime[data-has-sub="true"][aria-pressed="true"] {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      border-bottom: 1px dashed var(--border);
+      box-shadow: none;
+    }
+    .regime__head {
+      display: flex; align-items: flex-start; gap: 12px; margin-bottom: 0;
+    }
+    .regime__head .regime__check,
+    .regime__head .regime__tag {
+      margin-top: 1px;
+    }
+    .regime__title-block {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .regime__name {
+      font-size: 15px; font-weight: 700; color: var(--ink);
+      line-height: 1.35;
+      letter-spacing: -0.01em;
+    }
+    .regime__teaser {
+      display: block;
+      margin-top: 4px;
+      font-size: 12px;
+      font-style: italic;
+      font-weight: 500;
+      color: var(--muted);
+      line-height: 1.4;
+      letter-spacing: 0;
+    }
+    .sub-opt__teaser {
+      display: block;
+      width: 100%;
+      margin-top: 3px;
+      font-size: 11.5px;
+      font-style: italic;
+      font-weight: 500;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+    /* Bloc d'exemples affiché quand la card / sous-option est sélectionnée */
+    .examples {
+      margin-top: 0;
+      margin-left: 34px;
+      padding: 12px 14px;
+      background: var(--card);
+      border-radius: var(--radius-field, 8px);
+      border: 1px dashed var(--border);
+      text-align: left;
+    }
+    .examples--sub {
+      margin-top: 10px;
+      margin-left: 28px;
+      margin-right: 12px;
+      padding: 10px 12px;
+    }
+    .examples__label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+    .examples-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .examples-list li {
+      position: relative;
+      padding-left: 16px;
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--ink);
+    }
+    .examples-list--sub li { font-size: 12.5px; }
+    .examples-list li::before {
+      content: "";
+      position: absolute;
+      left: 4px; top: 0.62em;
+      width: 4px; height: 4px;
       border-radius: 50%;
-      border: 2px solid var(--border);
+      background: var(--primary);
+    }
+    .regime__check {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border);
       background: var(--card);
       flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
       transition: all 150ms;
+      color: transparent;
     }
-    .regime[aria-pressed="true"] .regime__radio {
+    .regime[aria-pressed="true"] .regime__check {
       border: none;
       background: var(--ink);
+      color: var(--card);
     }
-    .regime__radio::after {
-      content: "";
-      width: 0; height: 0;
-      border-radius: 50%;
-      background: var(--card);
-      transition: all 120ms;
-    }
-    .regime[aria-pressed="true"] .regime__radio::after {
-      width: 8px; height: 8px;
-    }
-    .regime__name {
-      font-size: 15px; font-weight: 700; color: var(--ink);
-    }
+    .regime__check svg { width: 12px; height: 12px; stroke-width: 3; }
     .regime__tag {
       font-family: var(--font-mono);
       font-size: 10px; font-weight: 700;
@@ -577,75 +753,254 @@
       background: oklch(92% 0 0);
       color: var(--muted);
       transition: all 150ms;
+      flex-shrink: 0;
     }
     .regime[aria-pressed="true"] .regime__tag {
       background: var(--primary);
       color: var(--ink);
     }
-    .regime__desc {
-      font-size: 13px;
-      color: var(--muted);
-      margin-left: 30px;
-      line-height: 1.5;
-      margin-bottom: 6px;
-    }
-    .regime__meta {
-      margin-left: 30px;
-      display: flex; gap: 12px; flex-wrap: wrap;
-    }
-    .regime__chip {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 6px;
-    }
-    .regime__chip--abat {
-      color: var(--accent);
-      background: rgba(250, 204, 21, 0.20);
-    }
-    .regime__chip--cot {
-      color: var(--muted);
-      background: oklch(93% 0 0);
-    }
-
-    /* ─── Verdict / Analyse express ─────────────────────────────── */
-    .verdict {
-      padding: 20px 24px;
+    /* Sous-question inline (zone qui s'ouvre sous la carte parente) */
+    .regime-wrap {
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 0;
     }
-    .verdict__status {
+    .sub-q {
+      background: var(--card);
+      border: 1px solid var(--ink);
+      border-top: none;
+      border-bottom-left-radius: var(--radius-btn-lg);
+      border-bottom-right-radius: var(--radius-btn-lg);
+      padding: 18px 20px 20px;
+      box-shadow: var(--shadow-md);
+      animation: slideDown 220ms var(--ease) both;
+    }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .sub-q__title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .sub-q__list {
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .sub-opt {
+      position: relative;
+      padding: 14px 4px;
+      border-radius: 0;
+      text-align: left;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      transition: background-color 150ms;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .sub-opt + .sub-opt::before {
+      content: "";
+      position: absolute;
+      top: -2px;
+      left: 0; right: 0;
+      height: 0;
+      border-top: 1px dashed var(--border-strong);
+      opacity: 0.45;
+    }
+    .sub-opt {
+      padding-left: 12px;
+      border-left: 2px solid transparent;
+    }
+    .sub-opt:hover {
+      background: transparent;
+      border-left-color: var(--border-strong);
+    }
+    .sub-opt[aria-pressed="true"] {
+      background: var(--primary-tint);
+      border-left-color: var(--primary);
+    }
+    .sub-opt[aria-pressed="true"]:hover {
+      background: var(--primary-tint);
+      border-left-color: var(--primary);
+    }
+    .sub-opt__head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 0; }
+    .sub-opt__check {
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border-strong);
+      background: var(--card);
+      flex-shrink: 0;
+      position: relative;
+      transition: all 150ms;
+      margin-top: 3px;
+    }
+    .sub-opt:hover .sub-opt__check { border-color: var(--ink); }
+    .sub-opt[aria-pressed="true"] .sub-opt__check {
+      border-color: var(--ink);
+      background: var(--card);
+    }
+    .sub-opt[aria-pressed="true"] .sub-opt__check::after {
+      content: "";
+      position: absolute;
+      inset: 2.5px;
+      border-radius: 50%;
+      background: var(--ink);
+    }
+    .sub-opt__check svg { display: none; }
+    .sub-opt__title-block {
+      flex: 1;
+      min-width: 0;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 12px;
+      gap: 8px;
+      flex-wrap: wrap;
     }
-    .verdict__label {
-      display: flex; align-items: center; gap: 8px;
-      font-size: 14px; font-weight: 800;
+    .sub-opt__name {
+      font-size: 13px; font-weight: 700; color: var(--ink);
+      line-height: 1.35;
     }
-    .verdict__dot {
-      width: 10px; height: 10px;
-      border-radius: 50%;
+    .sub-opt__tag {
+      font-family: var(--font-mono);
+      font-size: 9px; font-weight: 700;
+      padding: 2px 7px;
+      border-radius: var(--radius-pill);
+      letter-spacing: 0.08em;
+      background: oklch(92% 0 0);
+      color: var(--muted);
       flex-shrink: 0;
     }
-    .verdict__diff {
-      margin-left: auto;
-      font-family: var(--font-mono);
-      font-size: 12px; font-weight: 700;
-      text-align: right;
+    .sub-opt[aria-pressed="true"] .sub-opt__tag {
+      background: var(--primary); color: var(--ink);
     }
-    .verdict[data-tone="success"] .verdict__label,
-    .verdict[data-tone="success"] .verdict__diff { color: var(--success-content); }
-    .verdict[data-tone="success"] .verdict__dot { background: var(--success); }
-    .verdict[data-tone="warn"] .verdict__label,
-    .verdict[data-tone="warn"] .verdict__diff { color: var(--warn-content); }
-    .verdict[data-tone="warn"] .verdict__dot { background: var(--warn); }
-    .verdict[data-tone="error"] .verdict__label,
-    .verdict[data-tone="error"] .verdict__diff { color: var(--error-content); }
-    .verdict[data-tone="error"] .verdict__dot { background: var(--error); }
+    .sub-opt__stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      margin-left: 28px;
+      border-top: 1px solid var(--border);
+      padding-top: 8px;
+    }
+    .sub-opt[aria-pressed="true"] .sub-opt__stats { border-top-color: var(--border-strong); }
+    .sub-opt__stat {
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .sub-opt__stat + .sub-opt__stat {
+      border-left: 1px solid var(--border);
+      padding-left: 12px;
+    }
+    .sub-opt[aria-pressed="true"] .sub-opt__stat + .sub-opt__stat {
+      border-left-color: var(--border-strong);
+    }
+    .sub-opt__stat-label {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .sub-opt__stat-value {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .sub-opt__stat--abat .sub-opt__stat-value { color: var(--accent); }
 
+    /* ─── Verdict / Analyse express ──────────────────── */
+    .verdict {
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    /* Bandeau de verdict */
+    .verdict__banner {
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .verdict__banner-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .verdict__banner-icon svg { width: 22px; height: 22px; stroke-width: 2.2; }
+    .verdict__banner-text { flex: 1; min-width: 0; }
+    .verdict__banner-eyebrow {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
+    .verdict__banner-label {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.015em;
+      line-height: 1.25;
+    }
+    .verdict[data-tone="success"] .verdict__banner-icon { background: rgba(22, 163, 74, 0.12); color: var(--success-content); }
+    .verdict[data-tone="success"] .verdict__banner-label { color: var(--success-content); }
+    .verdict[data-tone="warn"] .verdict__banner-icon { background: rgba(217, 119, 6, 0.12); color: var(--warn-content); }
+    .verdict[data-tone="warn"] .verdict__banner-label { color: var(--warn-content); }
+    .verdict[data-tone="error"] .verdict__banner-icon { background: rgba(220, 38, 38, 0.10); color: var(--error-content); }
+    .verdict[data-tone="error"] .verdict__banner-label { color: var(--error-content); }
+
+    /* Chiffre-héros : écart fiscal */
+    .verdict__hero {
+      padding: 24px 24px 22px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0;
+    }
+    .verdict__hero-label {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--ink);
+      opacity: 0.75;
+      letter-spacing: -0.005em;
+      margin-bottom: 6px;
+    }
+    .verdict__hero-value {
+      font-family: var(--font-mono);
+      font-size: 36px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      margin-bottom: 12px;
+    }
+    .verdict[data-tone="success"] .verdict__hero-value { color: var(--success-content); }
+    .verdict[data-tone="warn"] .verdict__hero-value { color: var(--warn-content); }
+    .verdict[data-tone="error"] .verdict__hero-value { color: var(--error-content); }
+    .verdict__hero-sub {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    /* Comparaison empilée */
+    .compare {
+      padding: 24px 24px 20px;
+    }
+    .compare__title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 16px;
+      text-align: center;
+    }
     .chart {
       position: relative;
     }
@@ -707,17 +1062,89 @@
       background: var(--border);
       z-index: 2;
     }
-    .verdict__copy {
-      padding-top: 20px;
-      display: flex; flex-direction: column; gap: 14px;
+
+    /* Jauge charges/seuil */
+    .gauge {
+      padding: 22px 24px 24px;
     }
-    .verdict__copy p {
-      font-size: 15px;
+    .gauge__head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      gap: 12px;
+    }
+    .gauge__title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
       color: var(--muted);
-      line-height: 1.7;
     }
-    .verdict__copy strong { color: var(--ink); font-weight: 800; font-size: 17px; }
-    .verdict__copy strong.weak { font-size: inherit; font-weight: 700; }
+    .gauge__values {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .gauge__values .muted { color: var(--muted); font-weight: 500; }
+    .gauge__track {
+      position: relative;
+      height: 12px;
+      background: var(--neutral-tint);
+      border-radius: 6px;
+      overflow: visible;
+    }
+    .gauge__fill {
+      position: absolute;
+      top: 0; left: 0; bottom: 0;
+      border-radius: 6px;
+      transition: width 600ms var(--ease), background 200ms;
+    }
+    .gauge__fill[data-tone="success"] { background: var(--success); }
+    .gauge__fill[data-tone="warn"] { background: var(--warn); }
+    .gauge__fill[data-tone="error"] { background: var(--error); }
+    .gauge__threshold {
+      position: absolute;
+      top: -6px; bottom: -6px;
+      width: 2px;
+      background: var(--ink);
+      transition: left 600ms var(--ease);
+    }
+    .gauge__threshold::before {
+      content: "";
+      position: absolute;
+      top: -4px; left: -3px;
+      width: 8px; height: 8px;
+      background: var(--ink);
+      border-radius: 50%;
+    }
+    .gauge__legend {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      font-size: 11px;
+      color: var(--muted);
+      gap: 12px;
+    }
+    .gauge__legend-marker {
+      display: inline-flex; align-items: center; gap: 5px;
+    }
+    .gauge__legend-marker::before {
+      content: ""; display: inline-block;
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--ink);
+    }
+    .gauge__legend-strong { color: var(--ink); font-weight: 700; }
+
+    /* Phrase explicative finale */
+    .verdict__explain {
+      padding: 18px 24px 22px;
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+    .verdict__explain strong { color: var(--ink); font-weight: 700; }
 
     /* ─── Step 0 / Step 5 ────────────────────────────────────────── */
     .lede h2 {
@@ -739,8 +1166,8 @@
       gap: 16px;
       margin-bottom: 32px;
     }
-	
-	/* ─── Page À propos : sections et listes ─────────────────────── */
+
+    /* ─── Page À propos : sections et listes ─────────────────────── */
     .about-section {
       margin-bottom: 32px;
     }
@@ -768,8 +1195,8 @@
       gap: 8px;
     }
     .about-list li {
-      font-size: 14px;
-      line-height: 1.65;
+      font-size: 15px;
+      line-height: 1.75;
       color: var(--muted);
       padding-left: 20px;
       position: relative;
@@ -785,7 +1212,9 @@
       background: #000;
     }
     .about-list li strong { color: var(--ink); font-weight: 700; }
-	/* fin à propos */
+    .about-list a { transition: color 150ms; }
+    .about-list a:hover { color: var(--ink) !important; }
+    /* fin à propos */
 
     .feedback-card {
       padding: 28px 24px;
@@ -802,7 +1231,6 @@
       display: flex; align-items: center; justify-content: center;
     }
     .feedback-card__icon svg { stroke-width: 1.5; }
-    }
     .feedback-card__title {
       font-size: 18px; font-weight: 800;
       letter-spacing: -0.02em;
@@ -886,7 +1314,7 @@
       transition: color 150ms;
     }
     .footer__link:hover { color: var(--ink); }
-	.footer__author {
+    .footer__author {
       color: var(--muted);
       text-decoration: none;
       transition: color 150ms;
@@ -895,7 +1323,7 @@
     .footer__sep {
       margin: 0 8px;
       color: var(--border-strong);
-    }	
+    }
 
     /* ─── Animations ─────────────────────────────────────────────── */
     @keyframes fadeUp {
@@ -941,61 +1369,165 @@
   <script>
   /*  ════════════════════════════════════════════════════════════════
       MicroFisca — application standalone (vanilla JS)
-      Données fiscales : voir bloc REGIMES ci-dessous (sources URSSAF /
-      Service-Public.fr / BOFiP, dernière vérification dans le commentaire).
       ════════════════════════════════════════════════════════════════ */
   'use strict';
 
   /* ────────────────────────────────────────────────────────────────
      1. DONNÉES FISCALES — barèmes 2026
      ----------------------------------------------------------------
-     Sources :
-       • Abattements forfaitaires : Code général des impôts
-            – BIC : art. 50-0 (https://bofip.impots.gouv.fr/bofip/3610-PGP)
-            – BNC : art. 102 ter (https://bofip.impots.gouv.fr/bofip/3610-PGP)
-       • Cotisations sociales : barème URSSAF 2026
-            https://www.urssaf.fr/accueil/independant/exercer-mon-activite/microentrepreneur-auto-entrepreneur.html
-       • Plafonds de chiffre d'affaires : Service-Public.fr
-            https://www.service-public.fr/particuliers/vosdroits/F23267
+     Sources officielles utilisées :
+       • Régime fiscal de la micro-entreprise (abattements + seuils) :
+           Service-Public.fr — vérifié le 21 février 2026
+           https://entreprendre.service-public.gouv.fr/vosdroits/F23267
+       • Cotisations sociales 2026 :
+           Bercy / economie.gouv.fr — publié le 6 mars 2026
+           https://www.economie.gouv.fr/entreprises/gerer-sa-micro-entreprise/micro-entreprises-quel-est-le-montant-de-vos-cotisations-sociales
+       • Conséquences du dépassement de seuil :
+           Service-Public.fr — vérifié le 21 février 2026
+           https://entreprendre.service-public.gouv.fr/vosdroits/F32353
 
-     Dernière vérification : 2026-04-27
+     Architecture des régimes :
+       Les régimes sont structurés en 4 catégories principales (UI niveau 1).
+       Deux d'entre elles ont des sous-options (UI niveau 2) :
+         • Activité libérale → CIPAV ou non-CIPAV (cotisations différentes)
+         • Meublés de tourisme → classé ou non classé (abattements et seuils différents)
      ──────────────────────────────────────────────────────────────── */
 
-  const REGIMES = {
-    bnc: {
-      nom: 'Professions libérales',
-      tag: 'BNC',
-      abattement: 0.34,    // CGI art. 102 ter — stable depuis 2009
-      cotisations: 0.231,  // URSSAF 2026 — BNC libéral non-CIPAV (réforme progressive 2024-2027)
-      desc: 'Consultants, freelances, professions de santé, enseignants, artistes…',
-      exemple: 'Consultant RH, graphiste, coach, kinésithérapeute'
-    },
+  // Catégories principales (niveau 1) — affichées comme cartes à l'étape 1
+  const CATEGORIES = {
     bic_services: {
-      nom: 'Prestations de services',
+      nom: 'Activité de prestation de services',
       tag: 'BIC',
-      abattement: 0.50,    // CGI art. 50-0 — stable
-      cotisations: 0.212,  // URSSAF 2026 — BIC services
-      desc: 'Artisans, prestataires de services commerciaux ou artisanaux.',
-      exemple: 'Plombier, coiffeur à domicile, développeur web (statut commercial)'
+      hasSub: false,
+      defaultRegime: 'bic_prestations_services',
+      teaser: 'Ex. : artisanat du bâtiment, esthétique, VTC',
+      examples: [
+        'Artisans du bâtiment : plomberie, électricité, menuiserie, maçonnerie',
+        'Réparation automobile, livraison de repas',
+        'Coiffure à domicile, soins esthétiques (hors médicaux)',
+        'Agent commercial, agent immobilier, VTC'
+      ]
     },
-    bic_vente: {
-      nom: 'Vente de marchandises',
+    bnc_liberal: {
+      nom: 'Activité libérale',
+      tag: 'BNC',
+      hasSub: true,
+      subQuestion: 'Précisez votre activité',
+      subOptions: ['bnc_cipav', 'bnc_autres_prestations'],
+      teaser: 'Ex. : consultant, développeur, psychologue, architecte'
+    },
+    bic_commerce: {
+      nom: "Activité commerciale et d'hébergement, hors location de meublés de tourisme",
       tag: 'BIC',
-      abattement: 0.71,    // CGI art. 50-0 — stable
-      cotisations: 0.123,  // URSSAF 2026 — BIC vente / hébergement
-      desc: 'Achat-revente, restauration sur place, hébergement.',
-      exemple: 'E-commerce, restaurateur, gérant de chambre d’hôtes'
+      hasSub: false,
+      defaultRegime: 'bic_commerce_hebergement',
+      teaser: 'Ex. : e-commerce, restauration, hôtellerie',
+      examples: [
+        'Vente en magasin ou en ligne (e-commerce)',
+        'Restauration sur place ou à emporter, food-truck',
+        'Hôtellerie, auberge, gîte non classé en meublé de tourisme',
+        'Commerçant ambulant, marché'
+      ]
+    },
+    bic_meuble: {
+      nom: 'Activité de location de meublés de tourisme',
+      tag: 'BIC',
+      hasSub: true,
+      subQuestion: 'Précisez votre activité',
+      subOptions: ['bic_meuble_classe', 'bic_meuble_non_classe'],
+      teaser: 'Ex. : gîte classé, location Airbnb saisonnière'
     }
   };
 
-  // Plafonds CA 2026 (au-delà : sortie du régime micro à terme)
-  const SEUILS_CA = {
-    bnc: 77700,
-    bic_services: 77700,
-    bic_vente: 188700
+  // Régimes effectifs (niveau 2) — utilisés pour les calculs
+  const REGIMES = {
+    bic_commerce_hebergement: {
+      nom: "Activité commerciale et d'hébergement, hors location de meublés de tourisme",
+      nomCourt: "Activité commerciale et d'hébergement",
+      tag: 'BIC',
+      categorie: 'bic_commerce',
+      abattement: 0.71,
+      cotisations: 0.1230
+    },
+    bic_prestations_services: {
+      nom: 'Activité de prestation de services',
+      nomCourt: 'Prestations de services',
+      tag: 'BIC',
+      categorie: 'bic_services',
+      abattement: 0.50,
+      cotisations: 0.2120
+    },
+    bnc_autres_prestations: {
+      nom: 'Autres prestations de services',
+      nomCourt: 'Autres prestations de services',
+      tag: 'BNC',
+      categorie: 'bnc_liberal',
+      abattement: 0.34,
+      cotisations: 0.2560,
+      teaser: 'Ex. : consultant, développeur, graphiste, coach',
+      examples: [
+        'Consultant (informatique, marketing, gestion, stratégie)',
+        'Développeur, graphiste, rédacteur, traducteur',
+        'Coach professionnel, formateur indépendant',
+        'Photographe (hors artiste-auteur)'
+      ]
+    },
+    bnc_cipav: {
+      nom: 'Professions libérales réglementées relevant de la Cipav',
+      nomCourt: 'Professions libérales CIPAV',
+      tag: 'BNC',
+      categorie: 'bnc_liberal',
+      abattement: 0.34,
+      cotisations: 0.2320,
+      teaser: 'Ex. : architecte, psychologue, ostéopathe',
+      examples: [
+        'Architecte, architecte d’intérieur, géomètre, ingénieur-conseil',
+        'Psychologue, psychothérapeute, ostéopathe, ergothérapeute, diététicien',
+        'Guide-conférencier, guide ou accompagnateur de montagne, moniteur de ski',
+        'Expert automobile, expert près des tribunaux'
+      ]
+    },
+    bic_meuble_classe: {
+      nom: "Meublé de tourisme classé et chambre d'hôtes",
+      nomCourt: 'Meublé classé et chambre d\'hôtes',
+      tag: 'BIC',
+      categorie: 'bic_meuble',
+      abattement: 0.50,
+      cotisations: 0.0600,
+      teaser: 'Ex. : gîte classé Atout France, chambre d’hôtes',
+      examples: [
+        'Gîte rural classé Atout France',
+        'Meublé de tourisme avec classement étoilé officiel',
+        'Chambre d’hôtes (avec ou sans table d’hôtes)'
+      ]
+    },
+    bic_meuble_non_classe: {
+      nom: 'Meublé de tourisme non classé',
+      nomCourt: 'Meublé non classé',
+      tag: 'BIC',
+      categorie: 'bic_meuble',
+      abattement: 0.30,
+      cotisations: 0.0600,
+      teaser: 'Ex. : Airbnb sans classement, location saisonnière',
+      examples: [
+        'Location courte durée Airbnb sans classement officiel',
+        'Studio ou appartement loué à la nuitée / semaine, non classé',
+        'Location saisonnière sans label ni étoile'
+      ]
+    }
   };
 
-  const DERNIERE_MAJ = 'Avril 2026';
+  // Plafonds CA 2026 (revenus 2026 déclarés en 2027)
+  const SEUILS_CA = {
+    bic_commerce_hebergement: 203100,
+    bic_prestations_services: 83600,
+    bnc_autres_prestations: 83600,
+    bnc_cipav: 83600,
+    bic_meuble_classe: 83600,
+    bic_meuble_non_classe: 15000
+  };
+
+  const DERNIERE_MAJ = 'mai 2026';
 
   /* ────────────────────────────────────────────────────────────────
      2. HELPERS
@@ -1007,6 +1539,10 @@
   const fmtPct = (n) => (n * 100).toLocaleString('fr-FR',
     { maximumFractionDigits: 1 }) + ' %';
 
+  // Format à 2 décimales pour les cotisations (alignement avec les libellés officiels Bercy)
+  const fmtPctPrecise = (n) => (n * 100).toLocaleString('fr-FR',
+    { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' %';
+
   const fmtEURplain = (n) => new Intl.NumberFormat('fr-FR',
     { maximumFractionDigits: 0 }).format(n);
 
@@ -1016,6 +1552,23 @@
     if (!Number.isFinite(v)) return 0;
     return Math.max(0, Math.min(v, 1e9));
   };
+
+  // Branche un champ <input type="number"> sur state[key] avec validation safeNum,
+  // resync en cas de clamp, et un callback déclenché après chaque changement.
+  function bindNumberInput(input, key, onAfter) {
+    input.addEventListener('input', (e) => {
+      if (e.target.value === '') {
+        state[key] = '';
+      } else {
+        state[key] = safeNum(e.target.value);
+        // Resynchronisation si la saisie a été clampée
+        if (String(state[key]) !== e.target.value && !e.target.value.endsWith('.')) {
+          e.target.value = state[key];
+        }
+      }
+      onAfter();
+    });
+  }
 
   // Création d'élément concis
   function el(tag, attrs, ...children) {
@@ -1059,7 +1612,24 @@
     check:        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
     restart:      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>',
     edit:         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>',
-    piggy:        '<svg viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.66 3.58 3 8 3s8-1.34 8-3V6"/><path d="M4 12v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg>'
+    piggy:        '<svg viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.66 3.58 3 8 3s8-1.34 8-3V6"/><path d="M4 12v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg>',
+    // Catégories
+    cat_commerce: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h18l-1.5 11a2 2 0 01-2 1.8H6.5a2 2 0 01-2-1.8L3 9z"/><path d="M8 9V6a4 4 0 018 0v3"/></svg>',
+    cat_services: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 010 1.4l-7 7a1 1 0 01-.7.3H4v-3a1 1 0 01.3-.7l7-7a1 1 0 011.4 0l2 2z"/><path d="M14 5l3 3"/><circle cx="18.5" cy="5.5" r="2.5"/></svg>',
+    cat_liberal:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v5c0 4.4-3.4 8.5-8 9-4.6-.5-8-4.6-8-9V7l8-4z"/><path d="M9 12l2 2 4-4"/></svg>',
+    cat_meuble:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v9a1 1 0 001 1h12a1 1 0 001-1v-9"/><path d="M9 20v-6h6v6"/></svg>',
+    // Verdict
+    verdict_success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.5V12a10 10 0 11-5.9-9.1"/><polyline points="22 4 12 14 9 11"/></svg>',
+    verdict_warn:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+    verdict_error:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.86L1.82 18a2 2 0 001.7 3h16.96a2 2 0 001.7-3L13.7 3.86a2 2 0 00-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
+  };
+
+  // Mapping catégorie → icône Lucide
+  const CATEGORIE_ICONS = {
+    bic_commerce: 'cat_commerce',
+    bic_services: 'cat_services',
+    bnc_liberal:  'cat_liberal',
+    bic_meuble:   'cat_meuble'
   };
 
   /* ────────────────────────────────────────────────────────────────
@@ -1080,7 +1650,7 @@
   // le micro-fiscal est avantageux.
   function thresholdPct(regime) {
     const r = REGIMES[regime];
-    return ((r.abattement - r.cotisations) * 100).toFixed(1);
+    return ((r.abattement - r.cotisations) * 100).toLocaleString('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
   }
 
   /* ────────────────────────────────────────────────────────────────
@@ -1090,8 +1660,9 @@
   const state = {
     step: 0,
     prevStep: null,
-    regime: null,
-    ca: '',        // chaîne brute du champ (vide = non saisi)
+    categorie: null,   // clé de CATEGORIES (niveau 1 — choisi à l'étape 1)
+    regime: null,      // clé de REGIMES (niveau 2 — résolu après sous-option si besoin)
+    ca: '',            // chaîne brute du champ (vide = non saisi)
     charges: ''
   };
 
@@ -1100,14 +1671,31 @@
     render();
   }
 
+  // Sélection d'une catégorie (niveau 1) : si pas de sous-options, le régime est défini
+  // immédiatement ; sinon il faudra que l'utilisateur choisisse une sous-option.
+  function selectCategorie(catKey) {
+    const cat = CATEGORIES[catKey];
+    if (!cat.hasSub) {
+      setState({ categorie: catKey, regime: cat.defaultRegime });
+    } else {
+      // Si l'utilisateur change de catégorie, on reset le régime en attendant la sous-option
+      setState({ categorie: catKey, regime: null });
+    }
+  }
+
+  // Sélection d'une sous-option (niveau 2)
+  function selectSubRegime(regimeKey) {
+    setState({ regime: regimeKey });
+  }
+
   const goTo = (s) => setState({ prevStep: state.step, step: s });
   const next = () => setState({ prevStep: state.step, step: Math.min(state.step + 1, 4) });
   const back = () => setState({ prevStep: state.step, step: Math.max(state.step - 1, 1) });
   const home = () => setState({
-    step: 0, prevStep: null, regime: null, ca: '', charges: ''
+    step: 0, prevStep: null, categorie: null, regime: null, ca: '', charges: ''
   });
   const restart = () => setState({
-    step: 1, prevStep: null, regime: null, ca: '', charges: ''
+    step: 1, prevStep: null, categorie: null, regime: null, ca: '', charges: ''
   });
 
   /* ────────────────────────────────────────────────────────────────
@@ -1153,13 +1741,22 @@
     );
   }
 
+  // Alerte de dépassement de seuil micro-entreprise (rendue à l'étape 2 et au verdict)
+  function seuilDepasseInfoBox(regime) {
+    const seuil = SEUILS_CA[regime];
+    return InfoBox({
+      tone: 'orange', icon: '⚠️',
+      html: `<strong>ATTENTION : seuil micro-entreprise dépassé.</strong> Pour cette activité, le plafond annuel de chiffre d’affaires en 2026 est de <strong>${fmtEUR(seuil)}</strong>.<br>Pour en savoir plus sur les conséquences du dépassement, consultez <a href="https://entreprendre.service-public.gouv.fr/vosdroits/F32353" target="_blank" rel="noopener noreferrer" class="info__link">cette fiche</a>.`
+    });
+  }
+
   function PrimaryBtn(label, onClick, { disabled = false } = {}) {
     return el('button', {
       class: 'btn-primary',
       type: 'button',
       disabled: disabled || null,
-      onclick: disabled ? null : onClick
-    }, label, !disabled ? svgIcon(ICONS.chevronRight, 16) : null);
+      onclick: onClick
+    }, label, svgIcon(ICONS.chevronRight, 16));
   }
 
   function BackBtn(onClick) {
@@ -1220,9 +1817,9 @@
         el('h2', null, 'Vous envisagez de créer une micro-entreprise ?'),
       ),
       el('div', { class: 'copy' },
-        el('p', { html: 'La micro-entreprise est séduisante par sa simplicité. <br>Mais elle peut cacher un piège : sous-estimer les <strong>charges</strong> et l&#39<strong>impact sur ses impôts</strong>.' }),
-        el('p', { html: '<strong>MicroFisca</strong>&nbsp; permet de voir si vous risquez de payer des impôts sur de l&#39argent que vous n&#39avez pas gagné</strong>.' }),
-        el('p', { html: 'Cet outil est : <br>✅ &nbsp; 100% <strong>Gratuit</strong><br> ✅ &nbsp; <strong>Rapide</strong> (moins de 5 minutes) <br> ✅ &nbsp; <strong>Confidentiel</strong> (zéro donnée transmise).' })
+        el('p', { html: 'La micro-entreprise est séduisante par sa simplicité. <br>Mais elle peut cacher un piège : sous-estimer les <strong>charges</strong> et l&#39;<strong>impact sur ses impôts</strong>.' }),
+        (() => { const box = InfoBox({ tone: 'yellow', html: '<strong>MicroFisca</strong>&nbsp; permet de voir si <strong>vous risquez de payer des impôts sur de l&#39;argent que vous n&#39;avez pas gagné</strong> (dans le régime micro-fiscal classique).' }); box.style.fontSize = '15px'; box.style.lineHeight = '1.75'; return box; })(),
+        el('p', { html: 'Cet outil est : <br>✅ &nbsp; 100% <strong>Gratuit</strong><br> ✅ &nbsp; <strong>Rapide</strong> (moins de 5 minutes) <br> ✅ &nbsp; <strong>Confidentiel</strong> (zéro donnée collectée).' })
       ),
       el('button', {
         class: 'btn-cta', type: 'button',
@@ -1235,6 +1832,108 @@
   }
 
   /* Step 1 — Choix du régime ─────────────────────────────────────── */
+  // Liste d'exemples d'activités (rendue à plusieurs endroits dans Step 1)
+  function ExamplesList(examples, { sub = false } = {}) {
+    const ulClass = sub ? 'examples-list examples-list--sub' : 'examples-list';
+    const wrapClass = sub ? 'examples examples--sub' : 'examples';
+    const ul = el('ul', { class: ulClass });
+    examples.forEach((ex) => ul.appendChild(el('li', null, ex)));
+    return el('div', { class: wrapClass },
+      el('div', { class: 'examples__label' }, 'Exemples d’activités'),
+      ul
+    );
+  }
+
+  // Stats abattement / cotisations (mêmes blocs en niveau 1 et niveau 2)
+  function StatsRow(reg, { sub = false } = {}) {
+    const cls = sub ? 'sub-opt' : 'regime';
+    return el('div', { class: `${cls}__stats` },
+      el('div', { class: `${cls}__stat ${cls}__stat--abat` },
+        el('span', { class: `${cls}__stat-label` }, 'Abattement'),
+        el('span', { class: `${cls}__stat-value` }, fmtPct(reg.abattement))
+      ),
+      el('div', { class: `${cls}__stat` },
+        el('span', { class: `${cls}__stat-label` }, 'Cotisations'),
+        el('span', { class: `${cls}__stat-value` }, fmtPctPrecise(reg.cotisations))
+      )
+    );
+  }
+
+  // Carte de catégorie (niveau 1) — choix d'activité
+  function RegimeCard(catKey, cat, active) {
+    const btn = el('button', {
+      class: 'regime', type: 'button', role: 'radio',
+      'aria-checked': active ? 'true' : 'false',
+      'aria-pressed': active ? 'true' : 'false',
+      ...(cat.hasSub ? { dataset: { hasSub: 'true' } } : {}),
+      onclick: () => selectCategorie(catKey)
+    });
+
+    btn.appendChild(el('div', { class: 'regime__head' },
+      el('div', { class: 'regime__check', 'aria-hidden': 'true' },
+        svgIcon(ICONS.check, 12)
+      ),
+      el('div', { class: 'regime__title-block' },
+        el('span', { class: 'regime__name' }, cat.nom),
+        (!active && cat.teaser) ? el('span', { class: 'regime__teaser' }, cat.teaser) : null
+      ),
+      el('span', { class: 'regime__tag' }, cat.tag)
+    ));
+
+    // Exemples : visibles uniquement si la catégorie est active sans sous-options
+    if (active && !cat.hasSub && Array.isArray(cat.examples) && cat.examples.length) {
+      btn.appendChild(ExamplesList(cat.examples));
+    }
+
+    if (!cat.hasSub) {
+      btn.appendChild(StatsRow(REGIMES[cat.defaultRegime]));
+    } else {
+      btn.appendChild(el('div', { class: 'regime__sub-hint' },
+        svgIcon(ICONS.chevronRight, 12),
+        active ? 'Précisez ci-dessous' : `${cat.subOptions.length} types d'activité possibles`
+      ));
+    }
+
+    return btn;
+  }
+
+  // Sous-question inline (niveau 2) — affichée sous la carte parente active
+  function SubOptionsList(cat) {
+    const subWrap = el('div', { class: 'sub-q' });
+    const subList = el('div', { class: 'sub-q__list', role: 'radiogroup',
+      'aria-label': cat.subQuestion });
+
+    cat.subOptions.forEach((subKey) => {
+      const subReg = REGIMES[subKey];
+      const subActive = state.regime === subKey;
+      const examples = (subActive && Array.isArray(subReg.examples) && subReg.examples.length)
+        ? ExamplesList(subReg.examples, { sub: true })
+        : null;
+
+      subList.appendChild(el('button', {
+        class: 'sub-opt', type: 'button', role: 'radio',
+        'aria-checked': subActive ? 'true' : 'false',
+        'aria-pressed': subActive ? 'true' : 'false',
+        onclick: () => selectSubRegime(subKey)
+      },
+        el('div', { class: 'sub-opt__head' },
+          el('div', { class: 'sub-opt__check', 'aria-hidden': 'true' },
+            svgIcon(ICONS.check, 10)
+          ),
+          el('div', { class: 'sub-opt__title-block' },
+            el('span', { class: 'sub-opt__name' }, subReg.nom),
+            (!subActive && subReg.teaser) ? el('span', { class: 'sub-opt__teaser' }, subReg.teaser) : null
+          )
+        ),
+        examples,
+        StatsRow(subReg, { sub: true })
+      ));
+    });
+
+    subWrap.appendChild(subList);
+    return subWrap;
+  }
+
   function renderStep1() {
     const root = el('div', { class: 'step-enter' });
 
@@ -1244,41 +1943,25 @@
     ));
 
     const list = el('div', { class: 'regime-list', role: 'radiogroup',
-      'aria-label': 'Choisir un régime fiscal' });
+      'aria-label': 'Choisir une activité' });
 
-    Object.entries(REGIMES).forEach(([key, reg]) => {
-      const active = state.regime === key;
-      const btn = el('button', {
-        class: 'regime', type: 'button', role: 'radio',
-        'aria-checked': active ? 'true' : 'false',
-        'aria-pressed': active ? 'true' : 'false',
-        onclick: () => setState({ regime: key })
-      },
-        el('div', { class: 'regime__head' },
-          el('div', { class: 'regime__radio', 'aria-hidden': 'true' }),
-          el('span', { class: 'regime__name' }, reg.nom),
-          el('span', { class: 'regime__tag' }, reg.tag)
-        ),
-        el('p', { class: 'regime__desc' }, reg.desc),
-        el('div', { class: 'regime__meta' },
-          el('span', { class: 'regime__chip regime__chip--abat' },
-            'Abattement ' + fmtPct(reg.abattement)),
-          el('span', { class: 'regime__chip regime__chip--cot' },
-            'Cotisations ' + fmtPct(reg.cotisations))
-        )
-      );
-      list.appendChild(btn);
+    Object.entries(CATEGORIES).forEach(([catKey, cat]) => {
+      const active = state.categorie === catKey;
+      const wrap = el('div', { class: 'regime-wrap' });
+      wrap.appendChild(RegimeCard(catKey, cat, active));
+      if (active && cat.hasSub) wrap.appendChild(SubOptionsList(cat));
+      list.appendChild(wrap);
     });
     root.appendChild(list);
 
     root.appendChild(InfoBox({
       tone: 'yellow', icon: '📌',
-      html: '<strong>BNC</strong>&nbsp;(Bénéfices Non Commerciaux) : pour les activités <strong>intellectuelles ou libérales.</strong><br><strong>BIC</strong>&nbsp;(Bénéfices Industriels et Commerciaux) : pour les activités <strong>manuelles, artisanales ou commerciales.</strong>'
+      html: '<strong>BIC</strong>&nbsp;(Bénéfices Industriels et Commerciaux) : pour les activités <strong>manuelles, artisanales ou commerciales.</strong><br><strong>BNC</strong>&nbsp;(Bénéfices Non Commerciaux) : pour les activités <strong>intellectuelles ou libérales.</strong>'
     }));
 
     root.appendChild(InfoBox({
       tone: 'orange', icon: '⚠️',
-      html: 'Pour les activités de services, le mauvais régime peut faire varier le revenu imposable de plusieurs milliers d’euros.'
+      html: 'Pour les activités de services, le revenu imposable peut varier de plusieurs milliers d’euros selon le régime.'
     }));
 
     root.appendChild(el('div', { class: 'nav nav--end' },
@@ -1294,7 +1977,7 @@
 
     root.appendChild(el('div', { class: 'section-head' },
       el('h2', null, 'Quel est votre chiffre d’affaires annuel ?'),
-      el('p', { html: 'Indiquez votre CA, prévisionnel ou réel, pour déterminer votre <strong>revenu imposable</strong>&nbsp;(le montant soumis à l&#39impôt sur le revenu).' })
+      el('p', { html: 'Indiquez votre CA, prévisionnel ou réel, pour déterminer votre <strong>revenu imposable</strong>&nbsp;(le montant soumis à l&#39;impôt sur le revenu).' })
     ));
 
     // Card avec input + zone calculée dynamique
@@ -1309,16 +1992,7 @@
           'aria-label': 'Chiffre d’affaires annuel en euros',
           value: state.ca === '' ? '' : String(state.ca)
         });
-        input.addEventListener('input', (e) => {
-          if (e.target.value === '') {
-            state.ca = '';
-          } else {
-            state.ca = safeNum(e.target.value);
-            // Resynchronisation si la saisie a été clampée
-            if (String(state.ca) !== e.target.value && !e.target.value.endsWith('.')) {
-              e.target.value = state.ca;
-            }
-          }
+        bindNumberInput(input, 'ca', () => {
           refreshComputed();
           refreshAlert();
           syncNextDisabled();
@@ -1368,21 +2042,22 @@
         const d = computeAll(state.regime, ca, 0);
         alertArea.appendChild(InfoBox({
           tone: 'yellow', icon: '📌',
-          html: `<strong>Ce que ça signifie :</strong> en micro-entreprise, vous êtes imposé sur <strong>${fmtEUR(d.revenusImposables)}</strong>, pas sur votre bénéfice réel. L’abattement de ${fmtPct(REGIMES[state.regime].abattement)} est censé représenter vos frais professionnels.`
+          html: `<strong>Ce que ça signifie :</strong> en micro-entreprise, vous êtes imposé sur <strong>${fmtEUR(d.revenusImposables)}</strong>, pas sur votre bénéfice réel (dans le régime micro-fiscal classique, avec prélèvement à la source). L’abattement de ${fmtPct(REGIMES[state.regime].abattement)} est censé représenter vos frais professionnels.`
         }));
 
-        // Alerte de dépassement de seuil micro-entreprise (2026)
+        // Alerte de dépassement de seuil micro-entreprise (revenus 2026)
+        // Règle officielle (Service-Public.fr — F32353) :
+        //   • Le CA pris en compte est celui de N-1 et N-2, pas l'année en cours
+        //   • La sortie n'intervient qu'après 2 années consécutives de dépassement
+        //   • Effet au 1er janvier de l'année qui suit la 2e année consécutive
         const seuil = SEUILS_CA[state.regime];
         if (ca > seuil) {
-          alertArea.appendChild(InfoBox({
-            tone: 'orange', icon: '⚠️',
-            html: `<strong>Attention : seuil micro-entreprise dépassé.</strong> Pour le régime <strong>${REGIMES[state.regime].tag} ${REGIMES[state.regime].nom.toLowerCase()}</strong>, le plafond de chiffre d’affaires en 2026 est de <strong>${fmtEUR(seuil)}</strong>. Au-delà (et après deux années consécutives), vous basculez automatiquement au régime réel. La simulation reste indicative mais le régime micro ne sera plus applicable.`
-          }));
-        } else if (seuil - ca < seuil * 0.10) {
-          // Alerte douce à moins de 10% du plafond
+          alertArea.appendChild(seuilDepasseInfoBox(state.regime));
+        } else if (ca < seuil && seuil - ca < seuil * 0.10) {
+          // Alerte douce à moins de 10 % du plafond (exclu si CA = seuil exact)
           alertArea.appendChild(InfoBox({
             tone: 'neutral', icon: 'ℹ️',
-            html: `Vous approchez du plafond du régime ${REGIMES[state.regime].tag} (${fmtEUR(seuil)} en 2026). Pensez à anticiper.`
+            html: `Vous approchez du plafond annuel pour cette activité (${fmtEUR(seuil)} en 2026).`
           }));
         }
       }
@@ -1396,18 +2071,7 @@
       disabled: !(typeof state.ca === 'number' && state.ca > 0)
     });
     function syncNextDisabled() {
-      const ok = typeof state.ca === 'number' && state.ca > 0;
-      nextBtn.disabled = !ok;
-      // Ré-attache le handler si on l'a perdu via disabled
-      nextBtn.onclick = ok ? next : null;
-      // Re-créer l'icône chevron si besoin
-      if (ok && !nextBtn.querySelector('svg')) {
-        nextBtn.appendChild(svgIcon(ICONS.chevronRight, 16));
-      }
-      if (!ok) {
-        const svg = nextBtn.querySelector('svg');
-        if (svg) svg.remove();
-      }
+      nextBtn.disabled = !(typeof state.ca === 'number' && state.ca > 0);
     }
 
     root.appendChild(el('div', { class: 'nav' },
@@ -1459,23 +2123,13 @@
       }));
     }
 
-    chargesInput.addEventListener('input', (e) => {
-      if (e.target.value === '') {
-        state.charges = '';
-      } else {
-        state.charges = safeNum(e.target.value);
-        if (String(state.charges) !== e.target.value && !e.target.value.endsWith('.')) {
-          e.target.value = state.charges;
-        }
-      }
-      refreshNet();
-    });
+    bindNumberInput(chargesInput, 'charges', refreshNet);
 
     const card = Card([
       CalcRow({ label: 'Chiffre d’affaires annuel', value: fmtEUR(ca) }),
       CalcRow({
         label: 'Cotisations sociales',
-        badge: fmtPct(reg.cotisations),
+        badge: fmtPctPrecise(reg.cotisations),
         value: '− ' + fmtEUR(cotisations),
         valueColor: 'muted'
       }),
@@ -1529,14 +2183,36 @@
       el('p', null, 'Vue d’ensemble de vos informations.')
     ));
     root.appendChild(Card([
-      // Activité
+      // Activité (avec catégorie parente si sous-option)
+      // Activité (titre + détails)
       el('div', { class: 'recap-stripe' },
-        el('span', { class: 'recap-stripe__eyebrow' }, 'Activité'),
-        el('div', { class: 'recap-stripe__activity' },
-          el('span', null, reg.nom),
-          el('span', { class: 'calc-row__badge' }, reg.tag)
-        )
+        el('span', { class: 'recap-stripe__eyebrow' }, 'Activité')
       ),
+      (() => {
+        const cat = CATEGORIES[reg.categorie];
+        const showHierarchy = cat && cat.hasSub;
+        if (showHierarchy) {
+          return [
+            el('div', { class: 'calc-row' },
+              el('div', { class: 'calc-row__head' },
+                el('span', { class: 'calc-row__label' }, cat.nom),
+                el('span', { class: 'calc-row__badge' }, reg.tag)
+              )
+            ),
+            el('div', { class: 'calc-row' },
+              el('div', { class: 'calc-row__head' },
+                el('span', { class: 'calc-row__label' }, reg.nom)
+              )
+            )
+          ];
+        }
+        return el('div', { class: 'calc-row' },
+          el('div', { class: 'calc-row__head' },
+            el('span', { class: 'calc-row__label' }, reg.nom),
+            el('span', { class: 'calc-row__badge' }, reg.tag)
+          )
+        );
+      })(),
       // Base fiscale
       el('div', { class: 'recap-stripe', dataset: { tone: 'accent' } },
         el('span', { class: 'recap-stripe__eyebrow' }, 'Base fiscale')
@@ -1559,7 +2235,7 @@
       ),
       CalcRow({
         label: 'Cotisations sociales',
-        badge: fmtPct(reg.cotisations),
+        badge: fmtPctPrecise(reg.cotisations),
         value: '− ' + fmtEUR(d.cotisations),
         valueColor: 'muted'
       }),
@@ -1577,10 +2253,9 @@
 
     // Alerte seuil sur le verdict aussi (rappel)
     if (ca > SEUILS_CA[state.regime]) {
-      root.appendChild(InfoBox({
-        tone: 'orange', icon: '⚠️',
-        html: `<strong>Plafond micro dépassé :</strong> votre CA (${fmtEUR(ca)}) excède le seuil ${reg.tag} de ${fmtEUR(SEUILS_CA[state.regime])} pour 2026. Le régime micro n’est pas durable à ce niveau.`
-      }));
+      const seuilBox = seuilDepasseInfoBox(state.regime);
+      seuilBox.style.marginTop = '20px';
+      root.appendChild(seuilBox);
     }
 
     // ─── 2. Analyse express ───
@@ -1588,18 +2263,24 @@
       el('h2', null, 'Analyse express'),
       el('p', null, 'Le résultat du régime micro-fiscal appliqué à cette entreprise.')
     ));
+    const cat = CATEGORIES[reg.categorie];
+    const hasSub = cat && cat.hasSub;
+    const regimeLabel = hasSub
+      ? cat.nom.toLowerCase() + ' - ' + (reg.nomCourt || reg.nom).toLowerCase()
+      : (reg.nomCourt || reg.nom).toLowerCase();
     root.appendChild(renderAnalyseExpress({
       revenusImposables: d.revenusImposables,
       netReel: d.netReel,
       caNum: ca,
-      regimeNom: reg.nom.toLowerCase(),
+      regimeNom: regimeLabel,
+      regimeTag: reg.tag,
       threshold: thresholdPct(state.regime)
     }));
 
     // ─── 3. Avertissement ───
     const warn = InfoBox({
       tone: 'orange', icon: '⚠️',
-      html: '<strong>ATTENTION :</strong> cette analyse simplifiée a pour but d&#39aider à comprendre le régime micro-fiscal avec des exemples chiffrés.<strong>&nbsp;Ce n&#39est pas un conseil personnalisé permettant de décider de la pertinence de la micro-entreprise dans votre cas.</strong>&nbsp;<br>Pour une analyse fiscale complète adaptée à votre situation, d&#39autres éléments sont à prendre en compte et à voir avec un(e) expert-comptable ou un(e) fiscaliste.'
+      html: '<strong>ATTENTION :</strong> cette analyse simplifiée a pour but d&#39;aider à comprendre le régime micro-fiscal avec des exemples chiffrés.<strong>&nbsp;Ce n&#39;est pas un conseil personnalisé permettant de décider de la pertinence de la micro-entreprise dans votre cas.</strong>&nbsp;<br>Pour une analyse fiscale complète adaptée à votre situation, d&#39;autres éléments sont à prendre en compte et à voir avec un(e) expert-comptable ou un(e) fiscaliste.'
     });
     const warnExtra = el('div', { style: { marginTop: '6px' } },
       el('button', {
@@ -1626,73 +2307,113 @@
     return root;
   }
 
-  function renderAnalyseExpress({ revenusImposables, netReel, caNum, regimeNom, threshold }) {
+  // Classification du verdict : libellés et ton selon l'écart (revenu imposable − bénéfice réel)
+  function getVerdictMeta(diff) {
+    if (diff < 0) {
+      return {
+        tone: 'success',
+        label: 'Régime micro-fiscal avantageux',
+        heroLabel: 'Bénéfice réalisé qui est non imposable :',
+        heroValue: fmtEUR(Math.abs(diff)),
+        heroSub: 'Votre revenu imposable est inférieur à votre bénéfice réel : le régime micro-fiscal est avantageux.'
+      };
+    }
+    if (diff === 0) {
+      return {
+        tone: 'success',
+        label: 'Régime micro-fiscal à l’équilibre',
+        heroLabel: 'Bénéfice réalisé qui est non imposable :',
+        heroValue: fmtEUR(0),
+        heroSub: 'Votre revenu imposable correspond à votre bénéfice réel : le régime micro-fiscal est neutre.'
+      };
+    }
+    if (diff <= 1000) {
+      return {
+        tone: 'warn',
+        label: 'Régime micro-fiscal non optimal',
+        heroLabel: 'Revenus imposables au-delà de ce qui est réellement gagné :',
+        heroValue: fmtEUR(diff),
+        heroSub: 'Une partie de vos revenus imposables ne correspond pas à de l’argent réellement gagné. L’impact potentiel sur votre impôt sur le revenu reste faible.'
+      };
+    }
+    if (diff <= 5000) {
+      return {
+        tone: 'warn',
+        label: 'Régime micro-fiscal non optimal',
+        heroLabel: 'Revenus imposables au-delà de ce qui est réellement gagné :',
+        heroValue: fmtEUR(diff),
+        heroSub: 'Une partie de vos revenus imposables ne correspond pas à de l’argent réellement gagné. L’impact potentiel sur votre impôt sur le revenu reste modéré. Si vos charges sont élevées, le régime réel d’imposition pourrait être plus intéressant.'
+      };
+    }
+    return {
+      tone: 'error',
+      label: 'Régime micro-fiscal à reconsidérer',
+      heroLabel: 'Revenus imposables au-delà de ce qui est réellement gagné :',
+      heroValue: fmtEUR(diff),
+      heroSub: 'Une part significative de vos revenus imposables ne correspond pas à de l’argent réellement gagné. Le passage au régime réel d’imposition serait à étudier (surtout si votre CA et vos charges sont élevés).'
+    };
+  }
+
+  const VERDICT_ICON = { success: 'verdict_success', warn: 'verdict_warn', error: 'verdict_error' };
+
+  // Observer singleton pour le chart du verdict (déconnecté/réassocié à chaque re-render)
+  let chartResizeObserver = null;
+
+  function renderAnalyseExpress({ revenusImposables, netReel, caNum, regimeNom, regimeTag, threshold }) {
     const net = Math.max(0, netReel);
     const diff = revenusImposables - net;
+    const charges = typeof state.charges === 'number' ? state.charges : 0;
+    const chargesPct = caNum > 0 ? (charges / caNum) * 100 : 0;
 
-    let tone, label, diffLabel;
-    if (diff <= 0) {
-      tone = 'success';
-      label = net === revenusImposables
-        ? 'À l’équilibre'
-        : 'Schéma gagnant';
-      diffLabel = diff < 0
-        ? `${fmtEUR(Math.abs(diff))} gagnés non imposables`
-        : 'Ràs';
-    } else if (diff <= caNum * 0.05) {
-      tone = 'warn';
-      label = 'Pas optimal (pas grave si petit montant)';
-      diffLabel = `${fmtEUR(diff)} non gagnés mais imposables`;
-    } else {
-      tone = 'error';
-      label = 'Statut à revoir potentiellement si CA élevé';
-      diffLabel = `${fmtEUR(diff)} non gagnés mais imposables`;
-    }
-
-    const CHART_H = 220;
-    const LABEL_H = 52;
-    const maxVal = Math.max(revenusImposables, net, 1) * 1.15;
-    const hImpos = Math.round(revenusImposables / maxVal * CHART_H);
-    const hNet = Math.round(net / maxVal * CHART_H);
+    const { tone, label, heroLabel, heroValue, heroSub } = getVerdictMeta(diff);
+    const iconKey = VERDICT_ICON[tone];
+    const eyebrow = 'Résultat';
+    const explainHtml = `Vos charges réelles (hors cotisations sociales) représentent <strong>${chargesPct.toLocaleString('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} %</strong> du CA.<br> Pour une activité de type <strong>${regimeNom}</strong> (${regimeTag}), le régime micro-fiscal est optimal tant que ces charges sont inférieures à <strong>${threshold} %</strong> du CA.`;
 
     const card = el('div', { class: 'card' });
     const inner = el('div', { class: 'verdict', dataset: { tone } });
 
-    // Status row
-    inner.appendChild(el('div', { class: 'verdict__status' },
-      el('div', { class: 'verdict__label' },
-        el('div', { class: 'verdict__dot' }),
-        el('span', null, label)
+    inner.appendChild(el('div', { class: 'verdict__banner' },
+      el('div', { class: 'verdict__banner-icon', 'aria-hidden': 'true' },
+        svgIcon(ICONS[iconKey], 22)
       ),
-      el('span', { class: 'verdict__diff' }, diffLabel)
+      el('div', { class: 'verdict__banner-text' },
+        el('div', { class: 'verdict__banner-eyebrow' }, eyebrow),
+        el('div', { class: 'verdict__banner-label' }, label)
+      )
     ));
 
-    // Chart
-    const chartH = CHART_H + LABEL_H;
-    const chart = el('div', { class: 'chart', style: { height: chartH + 'px' } });
-    // refline et baseline sont positionnées après render via getBoundingClientRect (voir plus bas)
+    inner.appendChild(el('div', { class: 'verdict__hero' },
+      el('span', { class: 'verdict__hero-label' }, heroLabel),
+      el('span', { class: 'verdict__hero-value' }, heroValue),
+      el('span', { class: 'verdict__hero-sub' }, heroSub)
+    ));
+
+    const CHART_H = 220;
+    const LABEL_H = 52;
+    const maxValChart = Math.max(revenusImposables, net, 1) * 1.15;
+    const hImpos = Math.round(revenusImposables / maxValChart * CHART_H);
+    const hNet = Math.round(net / maxValChart * CHART_H);
+
+    const compareWrap = el('div', { class: 'compare' },
+      el('div', { class: 'compare__title' }, 'Revenu imposable vs Bénéfice réel')
+    );
+    const chart = el('div', { class: 'chart', style: { height: (CHART_H + LABEL_H) + 'px' } });
     const refline = el('div', { class: 'chart__refline' });
     chart.appendChild(refline);
     const barAccent = el('div', {
       class: 'chart__bar chart__bar--accent',
       style: { height: hImpos + 'px' }
     });
-    const bars = el('div', {
-      class: 'chart__bars',
-      style: { height: '100%' }
-    },
-      // Bar imposables
+    const bars = el('div', { class: 'chart__bars', style: { height: '100%' } },
       el('div', { class: 'chart__col' },
-        el('span', { class: 'chart__amount chart__amount--accent' },
-          fmtEUR(revenusImposables)),
+        el('span', { class: 'chart__amount chart__amount--accent' }, fmtEUR(revenusImposables)),
         barAccent,
         el('div', { class: 'chart__caption' },
-          el('div', { class: 'chart__caption-title chart__caption-title--accent' },
-            'Revenu imposable'),
+          el('div', { class: 'chart__caption-title chart__caption-title--accent' }, 'Revenu imposable'),
           el('div', { class: 'chart__caption-sub' }, 'base fiscale')
         )
       ),
-      // Bar net
       el('div', { class: 'chart__col' },
         el('span', { class: 'chart__amount chart__amount--ink' }, fmtEUR(net)),
         el('div', {
@@ -1708,34 +2429,25 @@
     chart.appendChild(bars);
     const baseline = el('div', { class: 'chart__baseline' });
     chart.appendChild(baseline);
-    inner.appendChild(chart);
+    compareWrap.appendChild(chart);
+    inner.appendChild(compareWrap);
 
-    // Alignement précis après render : refline au sommet de la barre bordeaux,
-    // baseline à la base réelle des barres (le « zéro » du graphique).
     function alignChartLines() {
       const chartRect = chart.getBoundingClientRect();
       const barRect = barAccent.getBoundingClientRect();
-      if (chartRect.height === 0) return; // pas encore visible
-      // -1 pour centrer le trait pointillé 2px sur le sommet de la barre
+      if (chartRect.height === 0) return;
       refline.style.bottom = (chartRect.bottom - barRect.top - 1) + 'px';
       baseline.style.bottom = (chartRect.bottom - barRect.bottom) + 'px';
     }
     requestAnimationFrame(alignChartLines);
-    // Recalage automatique si le graphique est redimensionné (responsive).
-    // Le ResizeObserver est détruit avec le nœud, donc pas de fuite mémoire.
     if (typeof ResizeObserver !== 'undefined') {
-      const ro = new ResizeObserver(alignChartLines);
-      ro.observe(chart);
+      // Singleton réutilisé entre renders pour éviter l'accumulation d'observers orphelins
+      if (chartResizeObserver) chartResizeObserver.disconnect();
+      chartResizeObserver = new ResizeObserver(alignChartLines);
+      chartResizeObserver.observe(chart);
     }
 
-    // Copy
-    const copy = el('div', { class: 'verdict__copy' },
-      el('p', { html: 'Le régime micro-fiscal est intéressant lorsque le <strong>bénéfice réel &gt; revenus imposables</strong>.' }),
-      el('p', {
-        html: `Pour une activité de type "<strong class="weak">${regimeNom}</strong>", cela implique que vos charges réelles (hors cotisations) ne dépassent pas <strong>${threshold} %</strong> de votre chiffre d’affaires.`
-      })
-    );
-    inner.appendChild(copy);
+    inner.appendChild(el('div', { class: 'verdict__explain', html: explainHtml }));
 
     card.appendChild(inner);
     return card;
@@ -1754,8 +2466,8 @@
     root.appendChild(el('section', { class: 'about-section' },
       el('h3', null, 'Qu’est-ce que MicroFisca ?'),
       el('p', { html: 'MicroFisca est un outil pédagogique destiné aux <strong>porteurs de projet, freelances et indépendants</strong> qui envisagent de créer une micro-entreprise, ou qui s’interrogent sur la pertinence de leur statut actuel.' }),
-      el('p', { html: 'Il répond à une question simple : <strong>vos charges réelles sont-elles bien couvertes par l’abattement forfaitaire du régime de la micro-entreprise ?</strong>' }),
-      el('p', { html: 'En micro-entreprise, l’État applique un pourcentage fixe pour estimer les frais professionnels (34 %, 50 % ou 71 % selon l’activité). Si les dépenses réelles dépassent ce forfait, il y a un risque de payer des impôts sur de l’argent non gagné. C’est ce que MicroFisca rend visible, chiffres à l’appui, en moins de 5 minutes.' })
+      el('p', { html: 'Il répond à une question simple : <strong>vos charges réelles sont-elles bien couvertes par l’abattement forfaitaire du régime micro-fiscal classique</strong> (avec prélèvement à la source) ?' }),
+      el('p', { html: 'En micro-entreprise, l’État applique un abattement forfaitaire fixe pour estimer les frais professionnels (entre 30 % et 71 % selon la nature de l’activité). Si les dépenses réelles dépassent ce forfait, il y a un risque de payer des impôts sur de l’argent non gagné. C’est ce que MicroFisca rend visible, chiffres à l’appui, en moins de 5 minutes.' })
     ));
 
     // ─── Section 2 : Limites ───
@@ -1764,7 +2476,7 @@
       el('p', null, 'Cette simulation est volontairement simplifiée pour rester pédagogique et accessible. Elle ne prend pas en compte par exemple :'),
       el('ul', { class: 'about-list' },
         el('li', { html: 'Le <strong>taux marginal d’imposition</strong> (TMI), qui détermine l’impôt sur le revenu effectivement payé selon le foyer fiscal ;' }),
-        el('li', { html: 'Les <strong>avantages spécifiques</strong> comme l&#39ACRE, l&#39exonération de TVA ou le versement libératoire.' })
+        el('li', { html: 'Les <strong>avantages spécifiques</strong> comme l&#39;<strong>ACRE</strong>, le <strong>versement libératoire de l&#39;impôt</strong> ou les <strong>crédits d&#39;impôt</strong>.' })
       )
     );
     section2.appendChild(InfoBox({
@@ -1774,18 +2486,21 @@
     root.appendChild(section2);
 
     // ─── Section 3 : Sources ───
-    root.appendChild(el('section', { class: 'about-section' },
+    const section3 = el('section', { class: 'about-section' },
       el('h3', null, 'Sources et mises à jour'),
-      el('p', null, 'Les taux et plafonds utilisés proviennent des sources officielles :'),
+      el('p', null, 'Les taux, abattements et seuils utilisés dans cet outil proviennent des sources suivantes :'),
       el('ul', { class: 'about-list' },
-        el('li', { html: '<strong>Abattements forfaitaires</strong> : Code général des impôts (art. 50-0 et 102 ter)' }),
-        el('li', { html: '<strong>Cotisations sociales</strong> : barème URSSAF 2026' }),
-        el('li', { html: '<strong>Plafonds de chiffre d’affaires</strong> : Service-Public.fr' })
+        el('li', { html: '<a href="https://entreprendre.service-public.gouv.fr/vosdroits/F23267" target="_blank" rel="noopener noreferrer">Régime fiscal de la micro-entreprise</a> (version vérifiée le 21 février 2026) ;' }),
+        el('li', { html: '<a href="https://www.economie.gouv.fr/entreprises/gerer-sa-micro-entreprise/micro-entreprises-quel-est-le-montant-de-vos-cotisations-sociales" target="_blank" rel="noopener noreferrer">Cotisations sociales 2026</a> (version publiée le 6 mars 2026) ;' }),
+        el('li', { html: '<a href="https://entreprendre.service-public.gouv.fr/vosdroits/F32353" target="_blank" rel="noopener noreferrer">Conséquences du dépassement des seuils de CA</a> (version vérifiée le 21 février 2026).' })
       ),
-      el('p', { html: `<strong>Dernière mise à jour : </strong>${DERNIERE_MAJ}.` }),
-      el('p', { html: '<strong>ATTENTION</strong> : Les barèmes URSSAF peuvent évoluer chaque année.' })
-    ));
-	
+      el('p', { html: `<br><strong>Dernière mise à jour de l’outil : </strong>${DERNIERE_MAJ}.` })
+    );
+    section3.appendChild(InfoBox({
+      tone: 'orange', icon: '⚠️',
+      html: '<strong>ATTENTION :</strong> les barèmes peuvent évoluer chaque année.'
+    }));
+    root.appendChild(section3);
 
     // Carte feedback
     const feedback = Card(

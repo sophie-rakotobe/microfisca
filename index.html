@@ -443,6 +443,12 @@
       line-height: 1.55;
       margin-top: 4px;
     }
+    .inline-row__sub--recap {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.55;
+      margin-top: 4px;
+    }
 
     /* ─── Boutons ────────────────────────────────────────────────── */
     .btn-primary {
@@ -547,13 +553,19 @@
     }
     .nav--end { justify-content: flex-end; }
 
-    /* ─── Sélecteur de régime (Step 1) ──────────────────────────── */
-    .regime-list {
+    /* ─── Cartes principales (Accordéons BIC/BNC stylisés comme "Regime") ─ */
+    .famille-list {
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      margin-bottom: 20px;
+      gap: 16px;
+      margin-bottom: 24px;
     }
+    .famille-acc {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    
     .regime {
       padding: 18px 20px;
       border-radius: var(--radius-btn-lg);
@@ -573,81 +585,23 @@
       border-color: var(--border-strong);
       box-shadow: var(--shadow-sm);
     }
-    .regime[aria-pressed="true"] {
-      border-color: var(--ink);
-      box-shadow: var(--shadow-md);
-    }
-    .regime__icon {
-      width: 38px; height: 38px;
-      border-radius: 10px;
-      background: var(--neutral-tint);
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-      color: var(--ink);
-      transition: background 150ms, color 150ms;
-    }
-    .regime[aria-pressed="true"] .regime__icon {
-      background: var(--primary);
-      color: var(--ink);
-    }
-    .regime__icon svg { width: 20px; height: 20px; stroke-width: 1.8; }
-    .regime__stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0;
-      margin-left: 34px;
-      margin-right: 34px;
-      border-top: 1px solid var(--border);
-      padding-top: 12px;
-    }
-    .regime[aria-pressed="true"] .regime__stats { border-top-color: var(--border); }
-    .regime__stat {
-      display: flex; flex-direction: column; gap: 2px;
-      padding: 0 2px;
-    }
-    .regime__stat + .regime__stat {
-      border-left: 1px solid var(--border);
-      padding-left: 14px;
-    }
-    .regime[aria-pressed="true"] .regime__stat + .regime__stat {
-      border-left-color: var(--border-strong);
-    }
-    .regime__stat-label {
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-    .regime__stat-value {
-      font-family: var(--font-mono);
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--ink);
-    }
-    .regime__stat--abat .regime__stat-value { color: var(--accent); }
-    .regime__sub-hint {
-      margin-left: 34px;
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--muted);
-      display: inline-flex; align-items: center; gap: 6px;
-    }
-    .regime__sub-hint svg { width: 12px; height: 12px; stroke-width: 2.2; }
-    /* Quand une sous-question est ouverte, on retire le radius bas */
-    .regime[data-has-sub="true"][aria-pressed="true"] {
-      border-bottom-left-radius: 0;
-      border-bottom-right-radius: 0;
-      border-bottom: 1px dashed var(--border);
-      box-shadow: none;
-    }
+    
+    /* Structure de l'entête du bouton d'option */
     .regime__head {
       display: flex; align-items: flex-start; gap: 12px; margin-bottom: 0;
     }
-    .regime__head .regime__check,
-    .regime__head .regime__tag {
+    /* Puce de la famille : bouton radio (sélection = pastille pleine) */
+    .regime__radio {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border);
+      background: var(--card);
+      flex-shrink: 0;
+      position: relative;
+      transition: all 150ms;
       margin-top: 1px;
     }
+    
     .regime__title-block {
       flex: 1;
       min-width: 0;
@@ -670,6 +624,169 @@
       line-height: 1.4;
       letter-spacing: 0;
     }
+    
+    .regime__tag {
+      font-family: var(--font-mono);
+      font-size: 10px; font-weight: 700;
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+      letter-spacing: 0.08em;
+      background: oklch(92% 0 0);
+      color: var(--muted);
+      transition: all 150ms;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    
+    .regime__sub-hint {
+      margin-left: 34px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .regime__sub-hint svg { width: 12px; height: 12px; stroke-width: 2.2; transition: transform 200ms var(--ease); }
+    
+    /* ─── Accordéon ouvert (Fusion avec le corps des options) ─── */
+    .famille-acc[data-open="true"] .regime {
+      border-color: var(--ink);
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      border-bottom: 1px dashed var(--border);
+      box-shadow: none; /* L'ombre est gérée par le corps encastré en dessous */
+      background: var(--card);
+    }
+    
+    .famille-acc[data-open="true"] .regime__radio {
+      border-color: var(--ink);
+      background: var(--card);
+    }
+    .famille-acc[data-open="true"] .regime__radio::after {
+      content: "";
+      position: absolute;
+      inset: 4px;
+      border-radius: 50%;
+      background: var(--ink);
+    }
+    .famille-acc[data-open="true"] .regime__tag {
+      background: var(--primary);
+      color: var(--ink);
+    }
+    .famille-acc[data-open="true"] .regime__sub-hint {
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .famille-acc[data-open="true"] .regime__sub-hint svg {
+      transform: rotate(90deg);
+      color: var(--ink);
+    }
+    
+    /* Conteneur des sous-options (style fusionné avec le bloc parent, fond blanc encastré) */
+    .famille-acc__body {
+      background: var(--card);
+      border: 1px solid var(--ink);
+      border-top: none;
+      border-bottom-left-radius: var(--radius-btn-lg);
+      border-bottom-right-radius: var(--radius-btn-lg);
+      padding: 18px 20px 20px;
+      box-shadow: var(--shadow-md);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      animation: slideDown 220ms var(--ease) both;
+    }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .famille-acc__title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0;
+    }
+    .sub-q__list {
+      display: flex; flex-direction: column; gap: 4px;
+    }
+
+    /* ─── Style "Sous-Option" appliqué aux activités ─────────────── */
+    .sub-opt {
+      position: relative;
+      padding: 14px 4px;
+      border-radius: 0;
+      text-align: left;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      transition: background-color 150ms;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .sub-opt + .sub-opt::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 36px; right: 0;
+      height: 0;
+      border-top: 1px solid var(--border);
+    }
+    /* On masque le séparateur de part et d'autre de l'option sélectionnée */
+    .sub-opt[aria-pressed="true"] + .sub-opt::before,
+    .sub-opt + .sub-opt[aria-pressed="true"]::before {
+      display: none;
+    }
+    .sub-opt {
+      padding-left: 12px;
+      border-left: 2px solid transparent;
+    }
+    .sub-opt:hover {
+      background: transparent;
+      border-left-color: var(--border-strong);
+    }
+    .sub-opt[aria-pressed="true"] {
+      background: var(--primary-tint);
+      border-left-color: var(--primary);
+    }
+    .sub-opt[aria-pressed="true"]:hover {
+      background: var(--primary-tint);
+      border-left-color: var(--primary);
+    }
+    .sub-opt__head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 0; }
+    /* Puce de la sous-option : coche (sélection = check blanc sur fond sombre) */
+    .sub-opt__check {
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border-strong);
+      background: var(--card);
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 150ms;
+      color: transparent;
+      margin-top: 3px;
+    }
+    .sub-opt__check svg { width: 8px; height: 8px; stroke-width: 3.5; }
+    .sub-opt:hover .sub-opt__check { border-color: var(--ink); }
+    .sub-opt[aria-pressed="true"] .sub-opt__check {
+      border: none;
+      background: var(--ink);
+      color: var(--card);
+    }
+    .sub-opt__title-block {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .sub-opt__name {
+      font-size: 13px; font-weight: 700; color: var(--ink);
+      line-height: 1.35;
+    }
     .sub-opt__teaser {
       display: block;
       width: 100%;
@@ -680,7 +797,41 @@
       color: var(--muted);
       line-height: 1.4;
     }
-    /* Bloc d'exemples affiché quand la card / sous-option est sélectionnée */
+    .sub-opt__stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      margin-left: 24px;
+      border-top: 1px solid var(--border);
+      padding-top: 8px;
+    }
+    .sub-opt[aria-pressed="true"] .sub-opt__stats { border-top-color: var(--border-strong); }
+    .sub-opt__stat {
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .sub-opt__stat + .sub-opt__stat {
+      border-left: 1px solid var(--border);
+      padding-left: 12px;
+    }
+    .sub-opt[aria-pressed="true"] .sub-opt__stat + .sub-opt__stat {
+      border-left-color: var(--border-strong);
+    }
+    .sub-opt__stat-label {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .sub-opt__stat-value {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .sub-opt__stat--abat .sub-opt__stat-value { color: var(--accent); }
+
+    /* Exemples */
     .examples {
       margin-top: 0;
       margin-left: 34px;
@@ -692,7 +843,7 @@
     }
     .examples--sub {
       margin-top: 10px;
-      margin-left: 28px;
+      margin-left: 24px;
       margin-right: 12px;
       padding: 10px 12px;
     }
@@ -728,189 +879,6 @@
       border-radius: 50%;
       background: var(--primary);
     }
-    .regime__check {
-      width: 22px; height: 22px;
-      border-radius: 50%;
-      border: 1.5px solid var(--border);
-      background: var(--card);
-      flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-      transition: all 150ms;
-      color: transparent;
-    }
-    .regime[aria-pressed="true"] .regime__check {
-      border: none;
-      background: var(--ink);
-      color: var(--card);
-    }
-    .regime__check svg { width: 12px; height: 12px; stroke-width: 3; }
-    .regime__tag {
-      font-family: var(--font-mono);
-      font-size: 10px; font-weight: 700;
-      padding: 2px 8px;
-      border-radius: var(--radius-pill);
-      letter-spacing: 0.08em;
-      background: oklch(92% 0 0);
-      color: var(--muted);
-      transition: all 150ms;
-      flex-shrink: 0;
-    }
-    .regime[aria-pressed="true"] .regime__tag {
-      background: var(--primary);
-      color: var(--ink);
-    }
-    /* Sous-question inline (zone qui s'ouvre sous la carte parente) */
-    .regime-wrap {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-    }
-    .sub-q {
-      background: var(--card);
-      border: 1px solid var(--ink);
-      border-top: none;
-      border-bottom-left-radius: var(--radius-btn-lg);
-      border-bottom-right-radius: var(--radius-btn-lg);
-      padding: 18px 20px 20px;
-      box-shadow: var(--shadow-md);
-      animation: slideDown 220ms var(--ease) both;
-    }
-    @keyframes slideDown {
-      from { opacity: 0; transform: translateY(-4px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    .sub-q__title {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 12px;
-    }
-    .sub-q__list {
-      display: flex; flex-direction: column; gap: 4px;
-    }
-    .sub-opt {
-      position: relative;
-      padding: 14px 4px;
-      border-radius: 0;
-      text-align: left;
-      border: none;
-      background: transparent;
-      cursor: pointer;
-      transition: background-color 150ms;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .sub-opt + .sub-opt::before {
-      content: "";
-      position: absolute;
-      top: -2px;
-      left: 0; right: 0;
-      height: 0;
-      border-top: 1px dashed var(--border-strong);
-      opacity: 0.45;
-    }
-    .sub-opt {
-      padding-left: 12px;
-      border-left: 2px solid transparent;
-    }
-    .sub-opt:hover {
-      background: transparent;
-      border-left-color: var(--border-strong);
-    }
-    .sub-opt[aria-pressed="true"] {
-      background: var(--primary-tint);
-      border-left-color: var(--primary);
-    }
-    .sub-opt[aria-pressed="true"]:hover {
-      background: var(--primary-tint);
-      border-left-color: var(--primary);
-    }
-    .sub-opt__head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 0; }
-    .sub-opt__check {
-      width: 14px; height: 14px;
-      border-radius: 50%;
-      border: 1.5px solid var(--border-strong);
-      background: var(--card);
-      flex-shrink: 0;
-      position: relative;
-      transition: all 150ms;
-      margin-top: 3px;
-    }
-    .sub-opt:hover .sub-opt__check { border-color: var(--ink); }
-    .sub-opt[aria-pressed="true"] .sub-opt__check {
-      border-color: var(--ink);
-      background: var(--card);
-    }
-    .sub-opt[aria-pressed="true"] .sub-opt__check::after {
-      content: "";
-      position: absolute;
-      inset: 2.5px;
-      border-radius: 50%;
-      background: var(--ink);
-    }
-    .sub-opt__check svg { display: none; }
-    .sub-opt__title-block {
-      flex: 1;
-      min-width: 0;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .sub-opt__name {
-      font-size: 13px; font-weight: 700; color: var(--ink);
-      line-height: 1.35;
-    }
-    .sub-opt__tag {
-      font-family: var(--font-mono);
-      font-size: 9px; font-weight: 700;
-      padding: 2px 7px;
-      border-radius: var(--radius-pill);
-      letter-spacing: 0.08em;
-      background: oklch(92% 0 0);
-      color: var(--muted);
-      flex-shrink: 0;
-    }
-    .sub-opt[aria-pressed="true"] .sub-opt__tag {
-      background: var(--primary); color: var(--ink);
-    }
-    .sub-opt__stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0;
-      margin-left: 28px;
-      border-top: 1px solid var(--border);
-      padding-top: 8px;
-    }
-    .sub-opt[aria-pressed="true"] .sub-opt__stats { border-top-color: var(--border-strong); }
-    .sub-opt__stat {
-      display: flex; flex-direction: column; gap: 2px;
-    }
-    .sub-opt__stat + .sub-opt__stat {
-      border-left: 1px solid var(--border);
-      padding-left: 12px;
-    }
-    .sub-opt[aria-pressed="true"] .sub-opt__stat + .sub-opt__stat {
-      border-left-color: var(--border-strong);
-    }
-    .sub-opt__stat-label {
-      font-size: 9px;
-      font-weight: 600;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-    .sub-opt__stat-value {
-      font-family: var(--font-mono);
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--ink);
-    }
-    .sub-opt__stat--abat .sub-opt__stat-value { color: var(--accent); }
 
     /* ─── Verdict / Analyse express ──────────────────── */
     .verdict {
@@ -1387,40 +1355,24 @@
            https://entreprendre.service-public.gouv.fr/vosdroits/F32353
 
      Architecture des régimes :
-       Les régimes sont structurés en 4 catégories principales (UI niveau 1).
-       Deux d'entre elles ont des sous-options (UI niveau 2) :
-         • Activité libérale → CIPAV ou non-CIPAV (cotisations différentes)
-         • Meublés de tourisme → classé ou non classé (abattements et seuils différents)
+       • Niveau 1 (présentation, étape 1) : 2 familles d'activité en accordéon,
+         BNC et BIC — voir FAMILLES.
+       • Niveau 2 (calcul) : chaque famille déplie ses régimes effectifs, seules
+         unités utilisées pour les calculs — voir REGIMES.
+           BNC : CIPAV / autres prestations
+           BIC : prestations de services / commerce-hébergement / meublé classé / meublé non classé
+       Les meublés de tourisme (classé, non classé) sont des régimes BIC,
+       pas une famille distincte.
      ──────────────────────────────────────────────────────────────── */
 
-  // Catégories principales (niveau 1) — affichées comme cartes à l'étape 1
-  const CATEGORIES = {
-    bic_services: {
-      nom: 'Activité de prestation de services',
+  // Régimes effectifs (niveau 2) — utilisés pour les calculs
+  const REGIMES = {
+    bic_commerce_hebergement: {
+      nom: "Activité commerciale et d'hébergement (hors meublés de tourisme)",
+      nomCourt: "commerce et hébergement - hors meublés de tourisme",
       tag: 'BIC',
-      hasSub: false,
-      defaultRegime: 'bic_prestations_services',
-      teaser: 'Ex. : artisanat du bâtiment, esthétique, VTC',
-      examples: [
-        'Artisans du bâtiment : plomberie, électricité, menuiserie, maçonnerie',
-        'Réparation automobile, livraison de repas',
-        'Coiffure à domicile, soins esthétiques (hors médicaux)',
-        'Agent commercial, agent immobilier, VTC'
-      ]
-    },
-    bnc_liberal: {
-      nom: 'Activité libérale',
-      tag: 'BNC',
-      hasSub: true,
-      subQuestion: 'Précisez votre activité',
-      subOptions: ['bnc_cipav', 'bnc_autres_prestations'],
-      teaser: 'Ex. : consultant, développeur, psychologue, architecte'
-    },
-    bic_commerce: {
-      nom: "Activité commerciale et d'hébergement, hors location de meublés de tourisme",
-      tag: 'BIC',
-      hasSub: false,
-      defaultRegime: 'bic_commerce_hebergement',
+      abattement: 0.71,
+      cotisations: 0.1230,
       teaser: 'Ex. : e-commerce, restauration, hôtellerie',
       examples: [
         'Vente en magasin ou en ligne (e-commerce)',
@@ -1429,39 +1381,24 @@
         'Commerçant ambulant, marché'
       ]
     },
-    bic_meuble: {
-      nom: 'Activité de location de meublés de tourisme',
-      tag: 'BIC',
-      hasSub: true,
-      subQuestion: 'Précisez votre activité',
-      subOptions: ['bic_meuble_classe', 'bic_meuble_non_classe'],
-      teaser: 'Ex. : gîte classé, location Airbnb saisonnière'
-    }
-  };
-
-  // Régimes effectifs (niveau 2) — utilisés pour les calculs
-  const REGIMES = {
-    bic_commerce_hebergement: {
-      nom: "Activité commerciale et d'hébergement, hors location de meublés de tourisme",
-      nomCourt: "Activité commerciale et d'hébergement",
-      tag: 'BIC',
-      categorie: 'bic_commerce',
-      abattement: 0.71,
-      cotisations: 0.1230
-    },
     bic_prestations_services: {
-      nom: 'Activité de prestation de services',
-      nomCourt: 'Prestations de services',
+      nom: 'Prestation de services',
+      nomCourt: 'Prestation de services',
       tag: 'BIC',
-      categorie: 'bic_services',
       abattement: 0.50,
-      cotisations: 0.2120
+      cotisations: 0.2120,
+      teaser: 'Ex. : artisanat du bâtiment, esthétique, VTC',
+      examples: [
+        'Artisans du bâtiment : plomberie, électricité, menuiserie, maçonnerie',
+        'Réparation automobile, livraison de repas',
+        'Coiffure à domicile, soins esthétiques (hors médicaux)',
+        'Agent commercial, agent immobilier, VTC'
+      ]
     },
     bnc_autres_prestations: {
       nom: 'Autres prestations de services',
       nomCourt: 'Autres prestations de services',
       tag: 'BNC',
-      categorie: 'bnc_liberal',
       abattement: 0.34,
       cotisations: 0.2560,
       teaser: 'Ex. : consultant, développeur, graphiste, coach',
@@ -1474,9 +1411,8 @@
     },
     bnc_cipav: {
       nom: 'Professions libérales réglementées relevant de la Cipav',
-      nomCourt: 'Professions libérales CIPAV',
+      nomCourt: 'Professions libérales réglementées Cipav',
       tag: 'BNC',
-      categorie: 'bnc_liberal',
       abattement: 0.34,
       cotisations: 0.2320,
       teaser: 'Ex. : architecte, psychologue, ostéopathe',
@@ -1488,10 +1424,9 @@
       ]
     },
     bic_meuble_classe: {
-      nom: "Meublé de tourisme classé et chambre d'hôtes",
-      nomCourt: 'Meublé classé et chambre d\'hôtes',
+      nom: "Location de meublés de tourisme classé et chambre d'hôtes",
+      nomCourt: "Location de meublés de tourisme classé et chambre d'hôtes",
       tag: 'BIC',
-      categorie: 'bic_meuble',
       abattement: 0.50,
       cotisations: 0.0600,
       teaser: 'Ex. : gîte classé Atout France, chambre d’hôtes',
@@ -1502,10 +1437,9 @@
       ]
     },
     bic_meuble_non_classe: {
-      nom: 'Meublé de tourisme non classé',
-      nomCourt: 'Meublé non classé',
+      nom: 'Location de meublés de tourisme non classé',
+      nomCourt: 'Location de meublés de tourisme non classé',
       tag: 'BIC',
-      categorie: 'bic_meuble',
       abattement: 0.30,
       cotisations: 0.0600,
       teaser: 'Ex. : Airbnb sans classement, location saisonnière',
@@ -1516,6 +1450,27 @@
       ]
     }
   };
+
+  // Familles d'activité (niveau 1 de l'étape 1) — regroupent les régimes par catégorie d'imposition
+  const FAMILLES = {
+    bnc: {
+      tag: 'BNC',
+      titre: 'Activité intellectuelle, de conseil ou libérale',
+      desc: 'Votre catégorie d\'imposition : "Bénéfices Non Commerciaux" (BNC).',
+      regimes: ['bnc_cipav', 'bnc_autres_prestations']
+    },
+    bic: {
+      tag: 'BIC',
+      titre: 'Activité manuelle, artisanale ou commerciale',
+      desc: 'Votre catégorie d\'imposition : "Bénéfices Industriels et Commerciaux" (BIC).',
+      regimes: ['bic_prestations_services', 'bic_commerce_hebergement', 'bic_meuble_classe', 'bic_meuble_non_classe']
+    }
+  };
+
+  // Table inverse régime → famille (récap étape 4 robuste, sans dépendre de state.famille)
+  const REGIME_TO_FAMILLE = Object.fromEntries(
+    Object.entries(FAMILLES).flatMap(([famKey, fam]) => fam.regimes.map((r) => [r, famKey]))
+  );
 
   // Plafonds CA 2026 (revenus 2026 déclarés en 2027)
   const SEUILS_CA = {
@@ -1613,23 +1568,10 @@
     restart:      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>',
     edit:         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>',
     piggy:        '<svg viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.66 3.58 3 8 3s8-1.34 8-3V6"/><path d="M4 12v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg>',
-    // Catégories
-    cat_commerce: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h18l-1.5 11a2 2 0 01-2 1.8H6.5a2 2 0 01-2-1.8L3 9z"/><path d="M8 9V6a4 4 0 018 0v3"/></svg>',
-    cat_services: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 010 1.4l-7 7a1 1 0 01-.7.3H4v-3a1 1 0 01.3-.7l7-7a1 1 0 011.4 0l2 2z"/><path d="M14 5l3 3"/><circle cx="18.5" cy="5.5" r="2.5"/></svg>',
-    cat_liberal:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v5c0 4.4-3.4 8.5-8 9-4.6-.5-8-4.6-8-9V7l8-4z"/><path d="M9 12l2 2 4-4"/></svg>',
-    cat_meuble:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v9a1 1 0 001 1h12a1 1 0 001-1v-9"/><path d="M9 20v-6h6v6"/></svg>',
     // Verdict
     verdict_success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.5V12a10 10 0 11-5.9-9.1"/><polyline points="22 4 12 14 9 11"/></svg>',
     verdict_warn:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
     verdict_error:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.86L1.82 18a2 2 0 001.7 3h16.96a2 2 0 001.7-3L13.7 3.86a2 2 0 00-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
-  };
-
-  // Mapping catégorie → icône Lucide
-  const CATEGORIE_ICONS = {
-    bic_commerce: 'cat_commerce',
-    bic_services: 'cat_services',
-    bnc_liberal:  'cat_liberal',
-    bic_meuble:   'cat_meuble'
   };
 
   /* ────────────────────────────────────────────────────────────────
@@ -1660,8 +1602,8 @@
   const state = {
     step: 0,
     prevStep: null,
-    categorie: null,   // clé de CATEGORIES (niveau 1 — choisi à l'étape 1)
-    regime: null,      // clé de REGIMES (niveau 2 — résolu après sous-option si besoin)
+    famille: null,     // clé de FAMILLES (niveau 1 — catégorie d'imposition BIC/BNC, choisie à l'étape 1)
+    regime: null,      // clé de REGIMES (niveau 2 — résolu via la sous-option de l'accordéon)
     ca: '',            // chaîne brute du champ (vide = non saisi)
     charges: ''
   };
@@ -1671,20 +1613,17 @@
     render();
   }
 
-  // Sélection d'une catégorie (niveau 1) : si pas de sous-options, le régime est défini
-  // immédiatement ; sinon il faudra que l'utilisateur choisisse une sous-option.
-  function selectCategorie(catKey) {
-    const cat = CATEGORIES[catKey];
-    if (!cat.hasSub) {
-      setState({ categorie: catKey, regime: cat.defaultRegime });
+  // Ouverture/fermeture d'une famille (niveau 1 — accordéon). Change de famille = on reset le régime.
+  function selectFamille(famKey) {
+    if (state.famille === famKey) {
+      setState({ famille: null, regime: null });
     } else {
-      // Si l'utilisateur change de catégorie, on reset le régime en attendant la sous-option
-      setState({ categorie: catKey, regime: null });
+      setState({ famille: famKey, regime: null });
     }
   }
 
-  // Sélection d'une sous-option (niveau 2)
-  function selectSubRegime(regimeKey) {
+  // Sélection d'un régime (niveau 2). On dérive la catégorie du régime pour garder l'état cohérent.
+  function selectRegime(regimeKey) {
     setState({ regime: regimeKey });
   }
 
@@ -1692,10 +1631,10 @@
   const next = () => setState({ prevStep: state.step, step: Math.min(state.step + 1, 4) });
   const back = () => setState({ prevStep: state.step, step: Math.max(state.step - 1, 1) });
   const home = () => setState({
-    step: 0, prevStep: null, categorie: null, regime: null, ca: '', charges: ''
+    step: 0, prevStep: null, famille: null, regime: null, ca: '', charges: ''
   });
   const restart = () => setState({
-    step: 1, prevStep: null, categorie: null, regime: null, ca: '', charges: ''
+    step: 1, prevStep: null, famille: null, regime: null, ca: '', charges: ''
   });
 
   /* ────────────────────────────────────────────────────────────────
@@ -1832,10 +1771,10 @@
   }
 
   /* Step 1 — Choix du régime ─────────────────────────────────────── */
-  // Liste d'exemples d'activités (rendue à plusieurs endroits dans Step 1)
-  function ExamplesList(examples, { sub = false } = {}) {
-    const ulClass = sub ? 'examples-list examples-list--sub' : 'examples-list';
-    const wrapClass = sub ? 'examples examples--sub' : 'examples';
+  // Liste d'exemples d'activités, rendue dans le corps d'une sous-option (niveau 2)
+  function ExamplesList(examples) {
+    const ulClass = 'examples-list examples-list--sub';
+    const wrapClass = 'examples examples--sub';
     const ul = el('ul', { class: ulClass });
     examples.forEach((ex) => ul.appendChild(el('li', null, ex)));
     return el('div', { class: wrapClass },
@@ -1844,94 +1783,47 @@
     );
   }
 
-  // Stats abattement / cotisations (mêmes blocs en niveau 1 et niveau 2)
-  function StatsRow(reg, { sub = false } = {}) {
-    const cls = sub ? 'sub-opt' : 'regime';
-    return el('div', { class: `${cls}__stats` },
-      el('div', { class: `${cls}__stat ${cls}__stat--abat` },
-        el('span', { class: `${cls}__stat-label` }, 'Abattement'),
-        el('span', { class: `${cls}__stat-value` }, fmtPct(reg.abattement))
+  // Stats abattement / cotisations d'un régime, affichées dans la sous-option (niveau 2)
+  function StatsRow(reg) {
+    return el('div', { class: 'sub-opt__stats' },
+      el('div', { class: 'sub-opt__stat sub-opt__stat--abat' },
+        el('span', { class: 'sub-opt__stat-label' }, 'Abattement'),
+        el('span', { class: 'sub-opt__stat-value' }, fmtPct(reg.abattement))
       ),
-      el('div', { class: `${cls}__stat` },
-        el('span', { class: `${cls}__stat-label` }, 'Cotisations'),
-        el('span', { class: `${cls}__stat-value` }, fmtPctPrecise(reg.cotisations))
+      el('div', { class: 'sub-opt__stat' },
+        el('span', { class: 'sub-opt__stat-label' }, 'Cotisations'),
+        el('span', { class: 'sub-opt__stat-value' }, fmtPctPrecise(reg.cotisations))
       )
     );
   }
 
-  // Carte de catégorie (niveau 1) — choix d'activité
-  function RegimeCard(catKey, cat, active) {
+  // Carte d'une activité (niveau 2) affichée dans le corps de l'accordéon d'une famille
+  function SubOptCard(regKey, reg, active) {
     const btn = el('button', {
-      class: 'regime', type: 'button', role: 'radio',
+      class: 'sub-opt', type: 'button', role: 'radio',
       'aria-checked': active ? 'true' : 'false',
       'aria-pressed': active ? 'true' : 'false',
-      ...(cat.hasSub ? { dataset: { hasSub: 'true' } } : {}),
-      onclick: () => selectCategorie(catKey)
+      onclick: () => selectRegime(regKey)
     });
 
-    btn.appendChild(el('div', { class: 'regime__head' },
-      el('div', { class: 'regime__check', 'aria-hidden': 'true' },
-        svgIcon(ICONS.check, 12)
+    btn.appendChild(el('div', { class: 'sub-opt__head' },
+      el('div', { class: 'sub-opt__check', 'aria-hidden': 'true' },
+        svgIcon(ICONS.check, 10)
       ),
-      el('div', { class: 'regime__title-block' },
-        el('span', { class: 'regime__name' }, cat.nom),
-        (!active && cat.teaser) ? el('span', { class: 'regime__teaser' }, cat.teaser) : null
-      ),
-      el('span', { class: 'regime__tag' }, cat.tag)
+      el('div', { class: 'sub-opt__title-block' },
+        el('span', { class: 'sub-opt__name' }, reg.nom),
+        (!active && reg.teaser) ? el('span', { class: 'sub-opt__teaser' }, reg.teaser) : null
+      )
     ));
 
-    // Exemples : visibles uniquement si la catégorie est active sans sous-options
-    if (active && !cat.hasSub && Array.isArray(cat.examples) && cat.examples.length) {
-      btn.appendChild(ExamplesList(cat.examples));
-    }
-
-    if (!cat.hasSub) {
-      btn.appendChild(StatsRow(REGIMES[cat.defaultRegime]));
-    } else {
-      btn.appendChild(el('div', { class: 'regime__sub-hint' },
-        svgIcon(ICONS.chevronRight, 12),
-        active ? 'Précisez ci-dessous' : `${cat.subOptions.length} types d'activité possibles`
-      ));
+    if (active) {
+      if (Array.isArray(reg.examples) && reg.examples.length) {
+        btn.appendChild(ExamplesList(reg.examples));
+      }
+      btn.appendChild(StatsRow(reg));
     }
 
     return btn;
-  }
-
-  // Sous-question inline (niveau 2) — affichée sous la carte parente active
-  function SubOptionsList(cat) {
-    const subWrap = el('div', { class: 'sub-q' });
-    const subList = el('div', { class: 'sub-q__list', role: 'radiogroup',
-      'aria-label': cat.subQuestion });
-
-    cat.subOptions.forEach((subKey) => {
-      const subReg = REGIMES[subKey];
-      const subActive = state.regime === subKey;
-      const examples = (subActive && Array.isArray(subReg.examples) && subReg.examples.length)
-        ? ExamplesList(subReg.examples, { sub: true })
-        : null;
-
-      subList.appendChild(el('button', {
-        class: 'sub-opt', type: 'button', role: 'radio',
-        'aria-checked': subActive ? 'true' : 'false',
-        'aria-pressed': subActive ? 'true' : 'false',
-        onclick: () => selectSubRegime(subKey)
-      },
-        el('div', { class: 'sub-opt__head' },
-          el('div', { class: 'sub-opt__check', 'aria-hidden': 'true' },
-            svgIcon(ICONS.check, 10)
-          ),
-          el('div', { class: 'sub-opt__title-block' },
-            el('span', { class: 'sub-opt__name' }, subReg.nom),
-            (!subActive && subReg.teaser) ? el('span', { class: 'sub-opt__teaser' }, subReg.teaser) : null
-          )
-        ),
-        examples,
-        StatsRow(subReg, { sub: true })
-      ));
-    });
-
-    subWrap.appendChild(subList);
-    return subWrap;
   }
 
   function renderStep1() {
@@ -1939,29 +1831,63 @@
 
     root.appendChild(el('div', { class: 'section-head' },
       el('h2', null, 'Quelle est votre activité ?'),
-      el('p', { html: 'En micro-entreprise, le régime fiscal varie selon la nature de l’activité. Chaque régime applique un <strong>abattement forfaitaire</strong> différent à votre CA pour calculer votre revenu imposable.' })
+      el('p', { html: 'Sélectionnez le type d\'activité correspondant à votre entreprise.' })
     ));
 
-    const list = el('div', { class: 'regime-list', role: 'radiogroup',
-      'aria-label': 'Choisir une activité' });
+    const list = el('div', { class: 'famille-list', role: 'radiogroup',
+      'aria-label': 'Choisir une famille d\'activité' });
 
-    Object.entries(CATEGORIES).forEach(([catKey, cat]) => {
-      const active = state.categorie === catKey;
-      const wrap = el('div', { class: 'regime-wrap' });
-      wrap.appendChild(RegimeCard(catKey, cat, active));
-      if (active && cat.hasSub) wrap.appendChild(SubOptionsList(cat));
-      list.appendChild(wrap);
+    Object.entries(FAMILLES).forEach(([famKey, fam]) => {
+      const isOpen = state.famille === famKey;
+      const accWrap = el('div', { class: 'famille-acc', dataset: { open: isOpen ? 'true' : 'false' } });
+
+      // En-tête de la famille (stylée comme les anciennes cartes « regime »)
+      const headerBtn = el('button', {
+        class: 'regime', type: 'button',
+        'aria-expanded': isOpen ? 'true' : 'false',
+        onclick: () => selectFamille(famKey)
+      },
+        el('div', { class: 'regime__head' },
+          el('div', { class: 'regime__radio', 'aria-hidden': 'true' }),
+          el('div', { class: 'regime__title-block' },
+            el('span', { class: 'regime__name' }, fam.titre),
+            (!isOpen && fam.desc) ? el('span', { class: 'regime__teaser' }, fam.desc) : null
+          ),
+          el('span', { class: 'regime__tag' }, fam.tag)
+        ),
+        el('div', { class: 'regime__sub-hint' },
+          svgIcon(ICONS.chevronRight, 12),
+          isOpen ? 'Précisez votre activité ci-dessous' : `${fam.regimes.length} types d'activité possibles`
+        )
+      );
+      accWrap.appendChild(headerBtn);
+
+      // Corps de l'accordéon : les activités détaillées de la famille
+      if (isOpen) {
+        const body = el('div', { class: 'famille-acc__body' });
+        const subList = el('div', { class: 'sub-q__list', role: 'radiogroup',
+          'aria-label': 'Précisez votre activité' });
+        fam.regimes.forEach((regKey) => {
+          const reg = REGIMES[regKey];
+          const active = state.regime === regKey;
+          subList.appendChild(SubOptCard(regKey, reg, active));
+        });
+        body.appendChild(subList);
+        accWrap.appendChild(body);
+      }
+
+      list.appendChild(accWrap);
     });
     root.appendChild(list);
 
     root.appendChild(InfoBox({
       tone: 'yellow', icon: '📌',
-      html: '<strong>BIC</strong>&nbsp;(Bénéfices Industriels et Commerciaux) : pour les activités <strong>manuelles, artisanales ou commerciales.</strong><br><strong>BNC</strong>&nbsp;(Bénéfices Non Commerciaux) : pour les activités <strong>intellectuelles ou libérales.</strong>'
+      html: 'En micro-entreprise, le régime fiscal varie selon la nature de l’activité. Chaque régime applique un abattement forfaitaire différent à votre CA pour calculer votre revenu imposable.'
     }));
 
     root.appendChild(InfoBox({
       tone: 'orange', icon: '⚠️',
-      html: 'Pour les activités de services, le revenu imposable peut varier de plusieurs milliers d’euros selon le régime.'
+      html: 'Pour les activités de services, le revenu imposable peut varier de plusieurs milliers d’euros selon la catégorie d’imposition (BNC ou BIC).'
     }));
 
     root.appendChild(el('div', { class: 'nav nav--end' },
@@ -1977,7 +1903,7 @@
 
     root.appendChild(el('div', { class: 'section-head' },
       el('h2', null, 'Quel est votre chiffre d’affaires annuel ?'),
-      el('p', { html: 'Indiquez votre CA, prévisionnel ou réel, pour déterminer votre <strong>revenu imposable</strong>&nbsp;(le montant soumis à l&#39;impôt sur le revenu).' })
+      el('p', { html: 'Indiquez votre CA annuel (prévisionnel ou réel), pour calculer le <strong>revenu imposable</strong> de votre micro-entreprise.' })
     ));
 
     // Card avec input + zone calculée dynamique
@@ -2042,7 +1968,7 @@
         const d = computeAll(state.regime, ca, 0);
         alertArea.appendChild(InfoBox({
           tone: 'yellow', icon: '📌',
-          html: `<strong>Ce que ça signifie :</strong> en micro-entreprise, vous êtes imposé sur <strong>${fmtEUR(d.revenusImposables)}</strong>, pas sur votre bénéfice réel (dans le régime micro-fiscal classique, avec prélèvement à la source). L’abattement de ${fmtPct(REGIMES[state.regime].abattement)} est censé représenter vos frais professionnels.`
+          html: `<strong>Ce que ça signifie :</strong> dans le régime micro-fiscal classique, le montant soumis à l'impôt sur le revenu pour votre activité est de <strong>${fmtEUR(d.revenusImposables)}</strong>.<br>L’<strong>abattement de ${fmtPct(REGIMES[state.regime].abattement)}</strong> dans ce calcul est censé représenter vos <strong>frais professionnels.</strong><br>Vos charges réelles ne sont pas prises en compte pour déterminer le revenu imposable.`
         }));
 
         // Alerte de dépassement de seuil micro-entreprise (revenus 2026)
@@ -2096,7 +2022,7 @@
 
     root.appendChild(el('div', { class: 'section-head' },
       el('h2', null, 'Quelles sont vos charges annuelles réelles ?'),
-      el('p', { html: 'Renseignez toutes vos charges annuelles (hors cotisations sociales), pour calculer votre <strong>bénéfice réel</strong>.' })
+      el('p', { html: 'Indiquez le total de vos charges annuelles réelles (hors cotisations sociales), pour calculer votre <strong>bénéfice réel</strong>.' })
     ));
 
     const cotisations = ca * reg.cotisations;
@@ -2152,7 +2078,7 @@
 
     root.appendChild(InfoBox({
       tone: 'yellow', icon: '📌',
-      html: '<strong>Le mythe du « pas de CA, pas de frais » :</strong> même sans chiffre d’affaires, votre activité peut engendrer des frais (abonnements logiciels, frais de déplacement,...). En micro-entreprise, ces charges réelles ne sont <em>pas</em> déductibles. Elles sont à prendre en compte pour évaluer la pertinence de ce statut.'
+      html: '<strong>Le mythe du « pas de CA, pas de frais » :</strong> même sans chiffre d’affaires, votre activité peut engendrer des frais (abonnements logiciels, frais de déplacement,...). <br>Ces charges réelles ne sont <em>pas</em> déductibles en micro-entreprise (contrairement à d\'autres formes juridiques). Elles sont à prendre en compte pour évaluer la pertinence de ce statut.'
     }));
 
     root.appendChild(el('div', { class: 'nav' },
@@ -2183,34 +2109,18 @@
       el('p', null, 'Vue d’ensemble de vos informations.')
     ));
     root.appendChild(Card([
-      // Activité (avec catégorie parente si sous-option)
-      // Activité (titre + détails)
+      // Activité : famille + activité détaillée (hiérarchie « ↳ »)
       el('div', { class: 'recap-stripe' },
         el('span', { class: 'recap-stripe__eyebrow' }, 'Activité')
       ),
       (() => {
-        const cat = CATEGORIES[reg.categorie];
-        const showHierarchy = cat && cat.hasSub;
-        if (showHierarchy) {
-          return [
-            el('div', { class: 'calc-row' },
-              el('div', { class: 'calc-row__head' },
-                el('span', { class: 'calc-row__label' }, cat.nom),
-                el('span', { class: 'calc-row__badge' }, reg.tag)
-              )
-            ),
-            el('div', { class: 'calc-row' },
-              el('div', { class: 'calc-row__head' },
-                el('span', { class: 'calc-row__label' }, reg.nom)
-              )
-            )
-          ];
-        }
-        return el('div', { class: 'calc-row' },
-          el('div', { class: 'calc-row__head' },
-            el('span', { class: 'calc-row__label' }, reg.nom),
-            el('span', { class: 'calc-row__badge' }, reg.tag)
-          )
+        const fam = FAMILLES[REGIME_TO_FAMILLE[state.regime]];
+        return el('div', { class: 'inline-row', dataset: { align: 'top' } },
+          el('div', { style: { flex: '1' } },
+            el('div', { class: 'inline-row__label' }, fam ? fam.titre : reg.nom),
+            el('div', { class: 'inline-row__sub--recap' }, '↳ ' + reg.nom)
+          ),
+          el('span', { class: 'calc-row__badge', style: { marginTop: '2px' } }, reg.tag)
         );
       })(),
       // Base fiscale
@@ -2263,11 +2173,8 @@
       el('h2', null, 'Analyse express'),
       el('p', null, 'Le résultat du régime micro-fiscal appliqué à cette entreprise.')
     ));
-    const cat = CATEGORIES[reg.categorie];
-    const hasSub = cat && cat.hasSub;
-    const regimeLabel = hasSub
-      ? cat.nom.toLowerCase() + ' - ' + (reg.nomCourt || reg.nom).toLowerCase()
-      : (reg.nomCourt || reg.nom).toLowerCase();
+    const fam = FAMILLES[REGIME_TO_FAMILLE[state.regime]];
+    const regimeLabel = (reg.nomCourt).toLowerCase();
     root.appendChild(renderAnalyseExpress({
       revenusImposables: d.revenusImposables,
       netReel: d.netReel,
@@ -2333,7 +2240,7 @@
         label: 'Régime micro-fiscal non optimal',
         heroLabel: 'Revenus imposables au-delà de ce qui est réellement gagné :',
         heroValue: fmtEUR(diff),
-        heroSub: 'Une partie de vos revenus imposables ne correspond pas à de l’argent réellement gagné. L’impact potentiel sur votre impôt sur le revenu reste faible.'
+        heroSub: 'Une partie de vos revenus imposables ne correspond pas à de l’argent réellement gagné. L’impact potentiel sur votre impôt sur le revenu reste relativement faible.'
       };
     }
     if (diff <= 5000) {
@@ -2342,7 +2249,7 @@
         label: 'Régime micro-fiscal non optimal',
         heroLabel: 'Revenus imposables au-delà de ce qui est réellement gagné :',
         heroValue: fmtEUR(diff),
-        heroSub: 'Une partie de vos revenus imposables ne correspond pas à de l’argent réellement gagné. L’impact potentiel sur votre impôt sur le revenu reste modéré. Si vos charges sont élevées, le régime réel d’imposition pourrait être plus intéressant.'
+        heroSub: 'Une partie de vos revenus imposables ne correspond pas à de l’argent réellement gagné. L’impact potentiel sur votre impôt sur le revenu reste relativement modéré. Si vos charges sont élevées, le régime réel d’imposition pourrait être plus intéressant.'
       };
     }
     return {
@@ -2368,7 +2275,7 @@
     const { tone, label, heroLabel, heroValue, heroSub } = getVerdictMeta(diff);
     const iconKey = VERDICT_ICON[tone];
     const eyebrow = 'Résultat';
-    const explainHtml = `Vos charges réelles (hors cotisations sociales) représentent <strong>${chargesPct.toLocaleString('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} %</strong> du CA.<br> Pour une activité de type <strong>${regimeNom}</strong> (${regimeTag}), le régime micro-fiscal est optimal tant que ces charges sont inférieures à <strong>${threshold} %</strong> du CA.`;
+    const explainHtml = `Vos <strong>charges réelles (hors cotisations sociales)</strong> représentent <strong>${chargesPct.toLocaleString('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} %</strong> du CA.<br> Pour une activité dans la catégorie <strong>${regimeNom}</strong> (${regimeTag}), le régime micro-fiscal est optimal tant que ces charges sont inférieures à <strong>${threshold} %</strong> du CA.<br><br><i style="font-size:11px;">(*) IR : impôt sur le revenu</i>`;
 
     const card = el('div', { class: 'card' });
     const inner = el('div', { class: 'verdict', dataset: { tone } });
@@ -2422,7 +2329,7 @@
         }),
         el('div', { class: 'chart__caption' },
           el('div', { class: 'chart__caption-title' }, 'Bénéfice réel'),
-          el('div', { class: 'chart__caption-sub' }, 'avant impôt')
+          el('div', { class: 'chart__caption-sub' }, 'avant IR(*)')
         )
       )
     );
@@ -2464,10 +2371,10 @@
 
     // ─── Section 1 : Qu'est-ce que MicroFisca ? ───
     root.appendChild(el('section', { class: 'about-section' },
-      el('h3', null, 'Qu’est-ce que MicroFisca ?'),
       el('p', { html: 'MicroFisca est un outil pédagogique destiné aux <strong>porteurs de projet, freelances et indépendants</strong> qui envisagent de créer une micro-entreprise, ou qui s’interrogent sur la pertinence de leur statut actuel.' }),
       el('p', { html: 'Il répond à une question simple : <strong>vos charges réelles sont-elles bien couvertes par l’abattement forfaitaire du régime micro-fiscal classique</strong> (avec prélèvement à la source) ?' }),
-      el('p', { html: 'En micro-entreprise, l’État applique un abattement forfaitaire fixe pour estimer les frais professionnels (entre 30 % et 71 % selon la nature de l’activité). Si les dépenses réelles dépassent ce forfait, il y a un risque de payer des impôts sur de l’argent non gagné. C’est ce que MicroFisca rend visible, chiffres à l’appui, en moins de 5 minutes.' })
+      el('p', { html: 'En micro-entreprise, l’État applique un abattement forfaitaire fixe pour estimer les frais professionnels (entre 30 % et 71 % selon la nature de l’activité).' }),
+      el('p', { html: 'Si les dépenses réelles dépassent ce forfait, il y a un <strong>risque de payer des impôts sur de l’argent non gagné</strong>. C’est ce que MicroFisca rend visible, chiffres à l’appui, en moins de 5 minutes.' })
     ));
 
     // ─── Section 2 : Limites ───
@@ -2494,7 +2401,7 @@
         el('li', { html: '<a href="https://www.economie.gouv.fr/entreprises/gerer-sa-micro-entreprise/micro-entreprises-quel-est-le-montant-de-vos-cotisations-sociales" target="_blank" rel="noopener noreferrer">Cotisations sociales 2026</a> (version publiée le 6 mars 2026) ;' }),
         el('li', { html: '<a href="https://entreprendre.service-public.gouv.fr/vosdroits/F32353" target="_blank" rel="noopener noreferrer">Conséquences du dépassement des seuils de CA</a> (version vérifiée le 21 février 2026).' })
       ),
-      el('p', { html: `<br><strong>Dernière mise à jour de l’outil : </strong>${DERNIERE_MAJ}.` })
+      el('p', { html: `<br><strong>Dernière mise à jour des valeurs : </strong>${DERNIERE_MAJ}.` })
     );
     section3.appendChild(InfoBox({
       tone: 'orange', icon: '⚠️',
@@ -2562,11 +2469,11 @@
       el('span', null,
         'Créé par ',
         el('a', {
-          href: 'https://www.linkedin.com/in/connectsophierakotobe/',
+          href: '#',
           target: '_blank',
           rel: 'noopener noreferrer',
           class: 'footer__author'
-        }, 'Sophie RAKOTOBE'),
+        }, 'XYZ'),
         ' - 2026'
       ),
       el('div', { class: 'footer__nav' },

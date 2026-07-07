@@ -62,6 +62,7 @@
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scrollbar-gutter: stable; }
     html, body { min-height: 100%; }
     body {
       font-family: var(--font-text);
@@ -244,12 +245,12 @@
       color: var(--ink);
     }
     .calc-row__head {
-	  display: flex;
-	  flex-direction: row;
-	  align-items: center;
-	  flex-wrap: wrap;
-	  gap: 6px;
-	  min-width: 0;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      min-width: 0;
     }
     .calc-row__label {
       font-size: 13px;
@@ -265,7 +266,7 @@
       border-radius: var(--radius-pill);
       background: var(--primary);
       color: var(--ink);
-	  flex-shrink: 0;
+      flex-shrink: 0;
     }
     .calc-row__value {
       font-family: var(--font-mono);
@@ -319,12 +320,13 @@
     }
     .info strong { font-weight: 700; }
     .info__link {
-      color: var(--accent);
+      color: var(--muted);
       font-weight: 700;
       text-decoration: underline;
       text-underline-offset: 2px;
       transition: color 150ms;
     }
+    .info__link:hover { color: var(--ink); }
 
     /* Section titres pour le verdict */
     .section-head { margin-bottom: 20px; }
@@ -542,7 +544,6 @@
       cursor: pointer;
     }
     .btn-link-inline { text-decoration: underline; text-underline-offset: 2px; }
-    .info a:hover { color: inherit !important; }
     .btn-link-inline:hover { text-decoration: underline; text-underline-offset: 2px; color: var(--warn-content); }
 
     .nav {
@@ -693,6 +694,10 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
+    }
+    /* Animation d'ouverture : jouée uniquement quand la famille vient de s'ouvrir,
+       pas à chaque re-render (sinon clignotement au changement de sous-option). */
+    .famille-acc__body--anim {
       animation: slideDown 220ms var(--ease) both;
     }
     @keyframes slideDown {
@@ -708,13 +713,13 @@
       margin-bottom: 0;
     }
     .sub-q__list {
-      display: flex; flex-direction: column; gap: 4px;
+      display: flex; flex-direction: column; gap: 14px;
     }
 
     /* ─── Style "Sous-Option" appliqué aux activités ─────────────── */
     .sub-opt {
       position: relative;
-      padding: 14px 4px;
+      padding: 14px 4px 14px 16px;
       border-radius: 0;
       text-align: left;
       border: none;
@@ -726,34 +731,40 @@
       flex-direction: column;
       gap: 10px;
     }
-    .sub-opt + .sub-opt::before {
+    /* Liseret gauche en forme de crochet "[" : trait vertical + ticks haut/bas,
+       ouvert à droite. Un pseudo-élément est nécessaire, border-left seul
+       ne peut dessiner qu'un trait plein. */
+    .sub-opt::before {
       content: "";
       position: absolute;
+      left: 0;
       top: 0;
-      left: 36px; right: 0;
-      height: 0;
-      border-top: 1px solid var(--border);
-    }
-    /* On masque le séparateur de part et d'autre de l'option sélectionnée */
-    .sub-opt[aria-pressed="true"] + .sub-opt::before,
-    .sub-opt + .sub-opt[aria-pressed="true"]::before {
-      display: none;
-    }
-    .sub-opt {
-      padding-left: 12px;
-      border-left: 2px solid transparent;
+      bottom: 0;
+      width: 10px;
+      border-style: solid;
+      border-color: var(--border);
+      border-width: 2px 0 2px 4px; /* haut / droite / bas / gauche */
+      border-radius: 2px;
+      transition: border-color 150ms;
+      pointer-events: none;
     }
     .sub-opt:hover {
       background: transparent;
-      border-left-color: var(--border-strong);
     }
-    .sub-opt[aria-pressed="true"] {
-      background: var(--primary-tint);
-      border-left-color: var(--primary);
+    .sub-opt:hover::before {
+      border-color: var(--ink);
     }
-    .sub-opt[aria-pressed="true"]:hover {
+    .sub-opt[aria-checked="true"] {
       background: var(--primary-tint);
-      border-left-color: var(--primary);
+    }
+    .sub-opt[aria-checked="true"]::before {
+      border-color: var(--primary);
+    }
+    .sub-opt[aria-checked="true"]:hover {
+      background: var(--primary-tint);
+    }
+    .sub-opt[aria-checked="true"]:hover::before {
+      border-color: var(--primary);
     }
     .sub-opt__head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 0; }
     /* Puce de la sous-option : coche (sélection = check blanc sur fond sombre) */
@@ -770,7 +781,7 @@
     }
     .sub-opt__check svg { width: 8px; height: 8px; stroke-width: 3.5; }
     .sub-opt:hover .sub-opt__check { border-color: var(--ink); }
-    .sub-opt[aria-pressed="true"] .sub-opt__check {
+    .sub-opt[aria-checked="true"] .sub-opt__check {
       border: none;
       background: var(--ink);
       color: var(--card);
@@ -805,7 +816,7 @@
       border-top: 1px solid var(--border);
       padding-top: 8px;
     }
-    .sub-opt[aria-pressed="true"] .sub-opt__stats { border-top-color: var(--border-strong); }
+    .sub-opt[aria-checked="true"] .sub-opt__stats { border-top-color: var(--border-strong); }
     .sub-opt__stat {
       display: flex; flex-direction: column; gap: 2px;
     }
@@ -813,7 +824,7 @@
       border-left: 1px solid var(--border);
       padding-left: 12px;
     }
-    .sub-opt[aria-pressed="true"] .sub-opt__stat + .sub-opt__stat {
+    .sub-opt[aria-checked="true"] .sub-opt__stat + .sub-opt__stat {
       border-left-color: var(--border-strong);
     }
     .sub-opt__stat-label {
@@ -1181,7 +1192,7 @@
     }
     .about-list li strong { color: var(--ink); font-weight: 700; }
     .about-list a { transition: color 150ms; }
-    .about-list a:hover { color: var(--ink) !important; }
+    .about-list a:hover { color: var(--ink); }
     /* fin à propos */
 
     .feedback-card {
@@ -1360,24 +1371,25 @@
        • Niveau 2 (calcul) : chaque famille déplie ses régimes effectifs, seules
          unités utilisées pour les calculs — voir REGIMES.
            BNC : CIPAV / autres prestations
-           BIC : prestations de services / commerce-hébergement / meublé classé / meublé non classé
-       Les meublés de tourisme (classé, non classé) sont des régimes BIC,
-       pas une famille distincte.
+           BIC : prestations de services / achat-revente ou restauration
+       Les locations de meublés de tourisme sont hors périmètre de l'outil
+       (règles de cotisations spécifiques : seuils de déclenchement, régime
+       distinct) — un renvoi est affiché à l'étape 1.
      ──────────────────────────────────────────────────────────────── */
 
   // Régimes effectifs (niveau 2) — utilisés pour les calculs
   const REGIMES = {
-    bic_commerce_hebergement: {
-      nom: "Activité commerciale et d'hébergement (hors meublés de tourisme)",
-      nomCourt: "commerce et hébergement - hors meublés de tourisme",
+    bic_commerce: {
+      nom: 'Achat-revente de marchandises ou restauration',
+      nomCourt: 'Achat-revente ou restauration',
       tag: 'BIC',
       abattement: 0.71,
       cotisations: 0.1230,
-      teaser: 'Ex. : e-commerce, restauration, hôtellerie',
+      teaser: 'Ex. : e-commerce, magasin, food-truck',
       examples: [
-        'Vente en magasin ou en ligne (e-commerce)',
+        'Vente en ligne (e-commerce)',
+		'Vente en magasin',
         'Restauration sur place ou à emporter, food-truck',
-        'Hôtellerie, auberge, gîte non classé en meublé de tourisme',
         'Commerçant ambulant, marché'
       ]
     },
@@ -1390,9 +1402,9 @@
       teaser: 'Ex. : artisanat du bâtiment, esthétique, VTC',
       examples: [
         'Artisans du bâtiment : plomberie, électricité, menuiserie, maçonnerie',
-        'Réparation automobile, livraison de repas',
+        'Réparation automobile, livraison de repas, VTC',
         'Coiffure à domicile, soins esthétiques (hors médicaux)',
-        'Agent commercial, agent immobilier, VTC'
+        'Agent commercial, agent immobilier'
       ]
     },
     bnc_autres_prestations: {
@@ -1422,32 +1434,6 @@
         'Guide-conférencier, guide ou accompagnateur de montagne, moniteur de ski',
         'Expert automobile, expert près des tribunaux'
       ]
-    },
-    bic_meuble_classe: {
-      nom: "Location de meublés de tourisme classé et chambre d'hôtes",
-      nomCourt: "Location de meublés de tourisme classé et chambre d'hôtes",
-      tag: 'BIC',
-      abattement: 0.50,
-      cotisations: 0.0600,
-      teaser: 'Ex. : gîte classé Atout France, chambre d’hôtes',
-      examples: [
-        'Gîte rural classé Atout France',
-        'Meublé de tourisme avec classement étoilé officiel',
-        'Chambre d’hôtes (avec ou sans table d’hôtes)'
-      ]
-    },
-    bic_meuble_non_classe: {
-      nom: 'Location de meublés de tourisme non classé',
-      nomCourt: 'Location de meublés de tourisme non classé',
-      tag: 'BIC',
-      abattement: 0.30,
-      cotisations: 0.0600,
-      teaser: 'Ex. : Airbnb sans classement, location saisonnière',
-      examples: [
-        'Location courte durée Airbnb sans classement officiel',
-        'Studio ou appartement loué à la nuitée / semaine, non classé',
-        'Location saisonnière sans label ni étoile'
-      ]
     }
   };
 
@@ -1456,14 +1442,14 @@
     bnc: {
       tag: 'BNC',
       titre: 'Activité intellectuelle, de conseil ou libérale',
-      desc: 'Votre catégorie d\'imposition : "Bénéfices Non Commerciaux" (BNC).',
+      desc: 'Catégorie d\'imposition : "Bénéfices Non Commerciaux" (BNC).',
       regimes: ['bnc_cipav', 'bnc_autres_prestations']
     },
     bic: {
       tag: 'BIC',
       titre: 'Activité manuelle, artisanale ou commerciale',
-      desc: 'Votre catégorie d\'imposition : "Bénéfices Industriels et Commerciaux" (BIC).',
-      regimes: ['bic_prestations_services', 'bic_commerce_hebergement', 'bic_meuble_classe', 'bic_meuble_non_classe']
+      desc: 'Catégorie d\'imposition : "Bénéfices Industriels et Commerciaux" (BIC).',
+      regimes: ['bic_prestations_services', 'bic_commerce']
     }
   };
 
@@ -1474,12 +1460,10 @@
 
   // Plafonds CA 2026 (revenus 2026 déclarés en 2027)
   const SEUILS_CA = {
-    bic_commerce_hebergement: 203100,
+    bic_commerce: 203100,
     bic_prestations_services: 83600,
     bnc_autres_prestations: 83600,
-    bnc_cipav: 83600,
-    bic_meuble_classe: 83600,
-    bic_meuble_non_classe: 15000
+    bnc_cipav: 83600
   };
 
   const DERNIERE_MAJ = 'mai 2026';
@@ -1498,8 +1482,8 @@
   const fmtPctPrecise = (n) => (n * 100).toLocaleString('fr-FR',
     { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' %';
 
-  const fmtEURplain = (n) => new Intl.NumberFormat('fr-FR',
-    { maximumFractionDigits: 0 }).format(n);
+  // Lit une valeur de state numérique en repliant '' (champ vide) et non-nombres sur 0
+  const numOr0 = (v) => (typeof v === 'number' ? v : 0);
 
   // Validation d'entrée numérique : refuse négatifs, infinis et au-delà de 1 milliard
   const safeNum = (raw) => {
@@ -1680,12 +1664,15 @@
     );
   }
 
-  // Alerte de dépassement de seuil micro-entreprise (rendue à l'étape 2 et au verdict)
+  // Information sur le plafond de CA (affichée à l'étape 2 et au verdict quand
+  // le CA saisi dépasse le plafond). Ton neutre volontaire : dépasser le plafond
+  // une année n'entraîne aucune conséquence immédiate (cf. règle des 2 années
+  // consécutives ci-dessous), donc on informe sans alarmer ni affirmer une sortie.
   function seuilDepasseInfoBox(regime) {
     const seuil = SEUILS_CA[regime];
     return InfoBox({
-      tone: 'orange', icon: '⚠️',
-      html: `<strong>ATTENTION : seuil micro-entreprise dépassé.</strong> Pour cette activité, le plafond annuel de chiffre d’affaires en 2026 est de <strong>${fmtEUR(seuil)}</strong>.<br>Pour en savoir plus sur les conséquences du dépassement, consultez <a href="https://entreprendre.service-public.gouv.fr/vosdroits/F32353" target="_blank" rel="noopener noreferrer" class="info__link">cette fiche</a>.`
+      tone: 'neutral', icon: 'ℹ️',
+      html: `Pour cette activité, le plafond annuel de chiffre d’affaires en 2026 est de <strong>${fmtEUR(seuil)}</strong>.<br>Pour en savoir plus sur les conséquences du dépassement, consultez <a href="https://entreprendre.service-public.gouv.fr/vosdroits/F32353" target="_blank" rel="noopener noreferrer" class="info__link">cette fiche</a>.`
     });
   }
 
@@ -1798,11 +1785,11 @@
   }
 
   // Carte d'une activité (niveau 2) affichée dans le corps de l'accordéon d'une famille
-  function SubOptCard(regKey, reg, active) {
+  function SubOptCard(regKey, reg, active, tabbable) {
     const btn = el('button', {
       class: 'sub-opt', type: 'button', role: 'radio',
       'aria-checked': active ? 'true' : 'false',
-      'aria-pressed': active ? 'true' : 'false',
+      tabindex: tabbable ? 0 : -1,
       onclick: () => selectRegime(regKey)
     });
 
@@ -1831,11 +1818,11 @@
 
     root.appendChild(el('div', { class: 'section-head' },
       el('h2', null, 'Quelle est votre activité ?'),
-      el('p', { html: 'Sélectionnez le type d\'activité correspondant à votre entreprise.' })
-    ));
-
-    const list = el('div', { class: 'famille-list', role: 'radiogroup',
-      'aria-label': 'Choisir une famille d\'activité' });
+      el('p', { html: 'Sélectionnez votre type d\'activité pour préciser votre <strong>régime micro-entreprise.</strong> <br><i>La location de meublés de tourisme n\'est pas couverte par l\'outil</i>.' })
+    ));	
+  
+    const list = el('div', { class: 'famille-list', role: 'group',
+      'aria-label': 'Type d\'activité' });
 
     Object.entries(FAMILLES).forEach(([famKey, fam]) => {
       const isOpen = state.famille === famKey;
@@ -1845,6 +1832,7 @@
       const headerBtn = el('button', {
         class: 'regime', type: 'button',
         'aria-expanded': isOpen ? 'true' : 'false',
+        'aria-controls': isOpen ? 'panel-' + famKey : null,
         onclick: () => selectFamille(famKey)
       },
         el('div', { class: 'regime__head' },
@@ -1857,20 +1845,48 @@
         ),
         el('div', { class: 'regime__sub-hint' },
           svgIcon(ICONS.chevronRight, 12),
-          isOpen ? 'Précisez votre activité ci-dessous' : `${fam.regimes.length} types d'activité possibles`
+          isOpen ? 'Précisez votre activité ci-dessous' : `${fam.regimes.length} types d'activité proposés`
         )
       );
       accWrap.appendChild(headerBtn);
 
       // Corps de l'accordéon : les activités détaillées de la famille
       if (isOpen) {
-        const body = el('div', { class: 'famille-acc__body' });
+        // On n'anime l'ouverture que si cette famille n'était pas déjà ouverte au rendu précédent.
+        const justOpened = __lastRenderedFamille !== famKey;
+        const body = el('div', {
+          class: 'famille-acc__body' + (justOpened ? ' famille-acc__body--anim' : ''),
+          id: 'panel-' + famKey
+        });
+        // Radiogroup niveau 2 : choix unique du régime, navigation clavier (flèches/Home/End)
         const subList = el('div', { class: 'sub-q__list', role: 'radiogroup',
-          'aria-label': 'Précisez votre activité' });
+          'aria-label': 'Précisez votre activité',
+          onkeydown: (e) => {
+            const keys = fam.regimes;
+            const radios = Array.from(subList.querySelectorAll('.sub-opt'));
+            // On navigue relativement au radio qui a le focus (pattern radio standard),
+            // avec repli sur le régime coché si le focus est ailleurs.
+            let cur = radios.indexOf(e.target.closest('.sub-opt'));
+            if (cur < 0) cur = keys.indexOf(state.regime);
+            let idx;
+            switch (e.key) {
+              case 'ArrowDown': case 'ArrowRight': idx = cur < 0 ? 0 : (cur + 1) % keys.length; break;
+              case 'ArrowUp':   case 'ArrowLeft':  idx = cur < 0 ? keys.length - 1 : (cur - 1 + keys.length) % keys.length; break;
+              case 'Home': idx = 0; break;
+              case 'End':  idx = keys.length - 1; break;
+              default: return;
+            }
+            e.preventDefault();
+            focusSelectedRegime = true;   // restaure le focus sur le radio coché après re-render
+            selectRegime(keys[idx]);
+          }
+        });
+        // Roving tabindex : seul le régime coché est tabbable (sinon le premier)
+        const tabbableKey = fam.regimes.includes(state.regime) ? state.regime : fam.regimes[0];
         fam.regimes.forEach((regKey) => {
           const reg = REGIMES[regKey];
           const active = state.regime === regKey;
-          subList.appendChild(SubOptCard(regKey, reg, active));
+          subList.appendChild(SubOptCard(regKey, reg, active, regKey === tabbableKey));
         });
         body.appendChild(subList);
         accWrap.appendChild(body);
@@ -1882,12 +1898,14 @@
 
     root.appendChild(InfoBox({
       tone: 'yellow', icon: '📌',
-      html: 'En micro-entreprise, le régime fiscal varie selon la nature de l’activité. Chaque régime applique un abattement forfaitaire différent à votre CA pour calculer votre revenu imposable.'
+      html: 'En micro-entreprise, les taux utilisés pour calculer votre revenu imposable et vos cotisations sociales dépendent de votre type activité.'
     }));
 
+	// Renvoi « hors périmètre » : les locations de meublés de tourisme ne sont pas couvertes
+	// Cotisations à seuils de déclenchement, régime spécifique — trop de complexité
     root.appendChild(InfoBox({
-      tone: 'orange', icon: '⚠️',
-      html: 'Pour les activités de services, le revenu imposable peut varier de plusieurs milliers d’euros selon la catégorie d’imposition (BNC ou BIC).'
+      tone: 'neutral', icon: 'ℹ️',
+      html: 'Pour la <strong>location de meublés de tourisme</strong> (location saisonnière, chambre d’hôtes...), il existe des règles particulières concernant les cotisations sociales (cf. <a href="https://entreprendre.service-public.gouv.fr/vosdroits/F39451" target="_blank" rel="noopener noreferrer" class="info__link">cette fiche</a>).<br>Elles n\'ont pas été intégrées dans MicroFisca pour la simplicité de l\'outil.'
     }));
 
     root.appendChild(el('div', { class: 'nav nav--end' },
@@ -1942,7 +1960,7 @@
     // Zone rendue dynamiquement (sans re-render complet) :
     function refreshComputed() {
       computedArea.innerHTML = '';
-      const ca = typeof state.ca === 'number' ? state.ca : 0;
+      const ca = numOr0(state.ca);
       if (ca > 0 && state.regime) {
         const d = computeAll(state.regime, ca, 0);
         computedArea.appendChild(CalcRow({
@@ -1963,7 +1981,7 @@
 
     function refreshAlert() {
       alertArea.innerHTML = '';
-      const ca = typeof state.ca === 'number' ? state.ca : 0;
+      const ca = numOr0(state.ca);
       if (ca > 0 && state.regime) {
         const d = computeAll(state.regime, ca, 0);
         alertArea.appendChild(InfoBox({
@@ -1971,8 +1989,9 @@
           html: `<strong>Ce que ça signifie :</strong> dans le régime micro-fiscal classique, le montant soumis à l'impôt sur le revenu pour votre activité est de <strong>${fmtEUR(d.revenusImposables)}</strong>.<br>L’<strong>abattement de ${fmtPct(REGIMES[state.regime].abattement)}</strong> dans ce calcul est censé représenter vos <strong>frais professionnels.</strong><br>Vos charges réelles ne sont pas prises en compte pour déterminer le revenu imposable.`
         }));
 
-        // Alerte de dépassement de seuil micro-entreprise (revenus 2026)
-        // Règle officielle (Service-Public.fr — F32353) :
+        // Information sur le plafond de CA (revenus 2026), affichée si le CA dépasse
+        // le plafond. Rappel de la règle officielle (Service-Public.fr — F32353) qui
+        // justifie le ton neutre : la sortie du régime n'est pas immédiate.
         //   • Le CA pris en compte est celui de N-1 et N-2, pas l'année en cours
         //   • La sortie n'intervient qu'après 2 années consécutives de dépassement
         //   • Effet au 1er janvier de l'année qui suit la 2e année consécutive
@@ -2011,12 +2030,16 @@
   /* Step 3 — Charges + bénéfice réel ──────────────────────────────── */
   function renderStep3() {
     const root = el('div', { class: 'step-enter' });
-    const ca = typeof state.ca === 'number' ? state.ca : 0;
+    const ca = numOr0(state.ca);
     const reg = REGIMES[state.regime];
 
     if (!reg || ca <= 0) {
-      // Garde-fou : si on tombe ici sans données valides
-      goTo(1);
+      // Invariant : l'étape 3 n'est jamais atteinte sans régime ni CA valide.
+      // La navigation le garantit en amont (bouton « suivant » désactivé tant que
+      // les données manquent, indicateur d'étapes limité aux étapes déjà franchies).
+      // Ce bloc ne devrait donc jamais s'exécuter : on ne navigue pas ici (cela
+      // provoquerait un render ré-entrant), on signale l'anomalie et on rend vide.
+      console.error('Invariant violé : étape 3 atteinte sans données valides', { regime: state.regime, ca: state.ca });
       return root;
     }
 
@@ -2038,7 +2061,7 @@
 
     function refreshNet() {
       netRow.innerHTML = '';
-      const ch = typeof state.charges === 'number' ? state.charges : 0;
+      const ch = numOr0(state.charges);
       const d = computeAll(state.regime, ca, ch);
       const negative = d.netReel < 0;
       netRow.appendChild(CalcRow({
@@ -2092,12 +2115,15 @@
   /* Step 4 — Verdict / bilan ─────────────────────────────────────── */
   function renderStep4() {
     const root = el('div', { class: 'step-enter' });
-    const ca = typeof state.ca === 'number' ? state.ca : 0;
-    const charges = typeof state.charges === 'number' ? state.charges : 0;
+    const ca = numOr0(state.ca);
+    const charges = numOr0(state.charges);
     const reg = REGIMES[state.regime];
 
     if (!reg || ca <= 0) {
-      goTo(1);
+      // Invariant : l'étape 4 n'est jamais atteinte sans régime ni CA valide
+      // (même garantie de navigation qu'à l'étape 3). On ne navigue pas ici pour
+      // éviter un render ré-entrant : on signale l'anomalie et on rend vide.
+      console.error('Invariant violé : étape 4 atteinte sans données valides', { regime: state.regime, ca: state.ca });
       return root;
     }
 
@@ -2161,7 +2187,7 @@
       })
     ], 'card--recap'));
 
-    // Alerte seuil sur le verdict aussi (rappel)
+    // Rappel du plafond de CA sur le verdict (si le CA dépasse le plafond)
     if (ca > SEUILS_CA[state.regime]) {
       const seuilBox = seuilDepasseInfoBox(state.regime);
       seuilBox.style.marginTop = '20px';
@@ -2269,7 +2295,7 @@
   function renderAnalyseExpress({ revenusImposables, netReel, caNum, regimeNom, regimeTag, threshold }) {
     const net = Math.max(0, netReel);
     const diff = revenusImposables - net;
-    const charges = typeof state.charges === 'number' ? state.charges : 0;
+    const charges = numOr0(state.charges);
     const chargesPct = caNum > 0 ? (charges / caNum) * 100 : 0;
 
     const { tone, label, heroLabel, heroValue, heroSub } = getVerdictMeta(diff);
@@ -2366,21 +2392,22 @@
 
     // Titre principal
     root.appendChild(el('div', { class: 'lede' },
-      el('h2', null, 'À propos de MicroFisca')
+      el('h2', null, 'À propos')
     ));
 
     // ─── Section 1 : Qu'est-ce que MicroFisca ? ───
     root.appendChild(el('section', { class: 'about-section' },
+	  el('h3', null, '1. Qu\'est-ce que MicroFisca ?'),
       el('p', { html: 'MicroFisca est un outil pédagogique destiné aux <strong>porteurs de projet, freelances et indépendants</strong> qui envisagent de créer une micro-entreprise, ou qui s’interrogent sur la pertinence de leur statut actuel.' }),
       el('p', { html: 'Il répond à une question simple : <strong>vos charges réelles sont-elles bien couvertes par l’abattement forfaitaire du régime micro-fiscal classique</strong> (avec prélèvement à la source) ?' }),
-      el('p', { html: 'En micro-entreprise, l’État applique un abattement forfaitaire fixe pour estimer les frais professionnels (entre 30 % et 71 % selon la nature de l’activité).' }),
+      el('p', { html: 'En micro-entreprise, l’État applique un abattement forfaitaire fixe pour estimer les frais professionnels (entre 30 % et 71 % selon le type d’activité).' }),
       el('p', { html: 'Si les dépenses réelles dépassent ce forfait, il y a un <strong>risque de payer des impôts sur de l’argent non gagné</strong>. C’est ce que MicroFisca rend visible, chiffres à l’appui, en moins de 5 minutes.' })
     ));
 
     // ─── Section 2 : Limites ───
     const section2 = el('section', { class: 'about-section' },
-      el('h3', null, 'Les limites de MicroFisca'),
-      el('p', null, 'Cette simulation est volontairement simplifiée pour rester pédagogique et accessible. Elle ne prend pas en compte par exemple :'),
+      el('h3', null, '2. Les limites de MicroFisca'),
+      el('p', { html: 'Cette simulation est volontairement simplifiée pour rester pédagogique et accessible. <br>Elle ne prend pas en compte par exemple :'}),
       el('ul', { class: 'about-list' },
         el('li', { html: 'Le <strong>taux marginal d’imposition</strong> (TMI), qui détermine l’impôt sur le revenu effectivement payé selon le foyer fiscal ;' }),
         el('li', { html: 'Les <strong>avantages spécifiques</strong> comme l&#39;<strong>ACRE</strong>, le <strong>versement libératoire de l&#39;impôt</strong> ou les <strong>crédits d&#39;impôt</strong>.' })
@@ -2388,25 +2415,28 @@
     );
     section2.appendChild(InfoBox({
       tone: 'orange', icon: '⚠️',
-      html: '<strong>Important :</strong> MicroFisca est un outil de sensibilisation, pas un conseil personnalisé. Pour une décision engageante (création, changement de statut, optimisation fiscale), consultez un(e) expert-comptable ou un(e) fiscaliste.'
+      html: '<strong>ATTENTION :</strong> MicroFisca est un outil de sensibilisation, pas un conseil personnalisé. Pour une décision engageante (création, changement de statut, optimisation fiscale), consultez un(e) expert-comptable ou un(e) fiscaliste.'
     }));
     root.appendChild(section2);
 
     // ─── Section 3 : Sources ───
     const section3 = el('section', { class: 'about-section' },
-      el('h3', null, 'Sources et mises à jour'),
+      el('h3', null, '3. Sources et mises à jour'),
       el('p', null, 'Les taux, abattements et seuils utilisés dans cet outil proviennent des sources suivantes :'),
       el('ul', { class: 'about-list' },
         el('li', { html: '<a href="https://entreprendre.service-public.gouv.fr/vosdroits/F23267" target="_blank" rel="noopener noreferrer">Régime fiscal de la micro-entreprise</a> (version vérifiée le 21 février 2026) ;' }),
         el('li', { html: '<a href="https://www.economie.gouv.fr/entreprises/gerer-sa-micro-entreprise/micro-entreprises-quel-est-le-montant-de-vos-cotisations-sociales" target="_blank" rel="noopener noreferrer">Cotisations sociales 2026</a> (version publiée le 6 mars 2026) ;' }),
         el('li', { html: '<a href="https://entreprendre.service-public.gouv.fr/vosdroits/F32353" target="_blank" rel="noopener noreferrer">Conséquences du dépassement des seuils de CA</a> (version vérifiée le 21 février 2026).' })
       ),
-      el('p', { html: `<br><strong>Dernière mise à jour des valeurs : </strong>${DERNIERE_MAJ}.` })
+      //el('p', { html: `<br><strong>Dernière mise à jour des valeurs : </strong>${DERNIERE_MAJ}.` })
     );
+    
+	// Information sur les mises à jour
     section3.appendChild(InfoBox({
-      tone: 'orange', icon: '⚠️',
-      html: '<strong>ATTENTION :</strong> les barèmes peuvent évoluer chaque année.'
+      tone: 'neutral', icon: 'ℹ️',
+      html: '<strong>Dernière mise à jour des valeurs : </strong>mai 2026 (les barèmes peuvent avoir évolué entretemps).'
     }));
+	
     root.appendChild(section3);
 
     // Carte feedback
@@ -2483,13 +2513,13 @@
           class: 'footer__link', type: 'button',
           onclick: () => goTo(5)
         }, 'À propos'),
-		el('span', { class: 'footer__sep' }, '·'),
-	    el('a', {
-        href: 'https://tally.so/r/Pd24xQ',
-        target: '_blank',
-        rel: 'noopener noreferrer',
-        class: 'footer__link'
-        }, 'Feedback'),	
+        el('span', { class: 'footer__sep' }, '·'),
+        el('a', {
+          href: 'https://tally.so/r/Pd24xQ',
+          target: '_blank',
+          rel: 'noopener noreferrer',
+          class: 'footer__link'
+        }, 'Feedback'),
       )
     );
   }
@@ -2501,6 +2531,15 @@
   // Trace le step réellement affiché à l'écran (indépendant de state.prevStep
   // qui n'est pas synchronisé sur tous les setState).
   let __lastRenderedStep = null;
+
+  // Trace la famille ouverte au rendu précédent. Sert à n'animer l'ouverture du
+  // panneau accordéon que lors d'une vraie ouverture, pas à chaque re-render
+  // (ex: changement de sous-option, qui laisse la famille inchangée).
+  let __lastRenderedFamille = null;
+
+  // Vrai quand une sélection de régime vient d'être faite au clavier (flèches) :
+  // après le re-render, on rend le focus au radio coché.
+  let focusSelectedRegime = false;
 
   function render() {
     const app = document.getElementById('app');
@@ -2540,12 +2579,21 @@
     }
 
     __lastRenderedStep = state.step;
+    __lastRenderedFamille = state.famille;
 
     // Focus management : sur changement d'étape, ramener le focus en haut du contenu (a11y)
     const heading = container.querySelector('h2, h1');
     if (heading && state.prevStep !== null && state.prevStep !== state.step) {
       heading.setAttribute('tabindex', '-1');
       requestAnimationFrame(() => heading.focus({ preventScroll: true }));
+    }
+
+    // Après une sélection de régime au clavier, rendre le focus au radio coché
+    // (le DOM a été entièrement remplacé, le focus serait sinon perdu).
+    if (focusSelectedRegime) {
+      const checked = container.querySelector('.sub-opt[aria-checked="true"]');
+      if (checked) requestAnimationFrame(() => checked.focus({ preventScroll: true }));
+      focusSelectedRegime = false;
     }
   }
 

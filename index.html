@@ -24,10 +24,8 @@
     :root {
       --primary: #facc15;
       --primary-tint: rgba(250, 204, 21, 0.10);
-      --primary-edge: rgba(250, 204, 21, 0.33);
       --accent: #800000;
       --accent-tint: rgba(128, 0, 0, 0.06);
-      --accent-edge: rgba(128, 0, 0, 0.33);
 
       --bg: oklch(97% 0 0);
       --card: oklch(100% 0 0);
@@ -366,28 +364,6 @@
     }
     .recap-stripe[data-tone="accent"] .recap-stripe__eyebrow { color: var(--accent); font-size: 10px; }
     .recap-stripe[data-tone="primary"] .recap-stripe__eyebrow { color: var(--ink); font-size: 10px; }
-    .recap-stripe__activity {
-      display: flex; align-items: center; gap: 8px;
-      font-size: 13px; font-weight: 600; color: var(--ink);
-    }
-    /* Récap hiérarchique : catégorie parente + sous-option */
-    .recap-stripe[data-tone="stack"] {
-      align-items: flex-start;
-      padding: 12px 20px;
-    }
-    .recap-stripe__stack {
-      display: flex; flex-direction: column; gap: 4px;
-      flex: 1;
-    }
-    .recap-stripe__parent {
-      font-size: 13px; font-weight: 700; color: var(--ink);
-      line-height: 1.35;
-    }
-    .recap-stripe__child {
-      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-      font-size: 12px; font-weight: 500; color: var(--muted);
-      line-height: 1.4;
-    }
 
     /* ─── Inputs numériques ──────────────────────────────────────── */
     .num-input {
@@ -703,14 +679,6 @@
     @keyframes slideDown {
       from { opacity: 0; transform: translateY(-4px); }
       to   { opacity: 1; transform: translateY(0); }
-    }
-    .famille-acc__title {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 0;
     }
     .sub-q__list {
       display: flex; flex-direction: column; gap: 14px;
@@ -1042,80 +1010,6 @@
       z-index: 2;
     }
 
-    /* Jauge charges/seuil */
-    .gauge {
-      padding: 22px 24px 24px;
-    }
-    .gauge__head {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      margin-bottom: 12px;
-      gap: 12px;
-    }
-    .gauge__title {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-    .gauge__values {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--ink);
-    }
-    .gauge__values .muted { color: var(--muted); font-weight: 500; }
-    .gauge__track {
-      position: relative;
-      height: 12px;
-      background: var(--neutral-tint);
-      border-radius: 6px;
-      overflow: visible;
-    }
-    .gauge__fill {
-      position: absolute;
-      top: 0; left: 0; bottom: 0;
-      border-radius: 6px;
-      transition: width 600ms var(--ease), background 200ms;
-    }
-    .gauge__fill[data-tone="success"] { background: var(--success); }
-    .gauge__fill[data-tone="warn"] { background: var(--warn); }
-    .gauge__fill[data-tone="error"] { background: var(--error); }
-    .gauge__threshold {
-      position: absolute;
-      top: -6px; bottom: -6px;
-      width: 2px;
-      background: var(--ink);
-      transition: left 600ms var(--ease);
-    }
-    .gauge__threshold::before {
-      content: "";
-      position: absolute;
-      top: -4px; left: -3px;
-      width: 8px; height: 8px;
-      background: var(--ink);
-      border-radius: 50%;
-    }
-    .gauge__legend {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 10px;
-      font-size: 11px;
-      color: var(--muted);
-      gap: 12px;
-    }
-    .gauge__legend-marker {
-      display: inline-flex; align-items: center; gap: 5px;
-    }
-    .gauge__legend-marker::before {
-      content: ""; display: inline-block;
-      width: 8px; height: 8px; border-radius: 50%;
-      background: var(--ink);
-    }
-    .gauge__legend-strong { color: var(--ink); font-weight: 700; }
-
     /* Phrase explicative finale */
     .verdict__explain {
       padding: 18px 24px 22px;
@@ -1236,33 +1130,6 @@
       transition: transform 120ms var(--ease);
     }
     .feedback-card__btn:hover { transform: scale(1.02); }
-
-    /* ─── Étape : champ unique CA / Charges (gros input vertical) */
-    .big-num {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .big-num__field {
-      flex: 1;
-      text-align: right;
-      font-family: var(--font-mono);
-      font-size: 22px;
-      font-weight: 700;
-      padding: 12px 16px;
-      border-radius: var(--radius-input);
-      border: 1.5px solid var(--border);
-      background: var(--card);
-      color: var(--ink);
-      transition: border-color 150ms;
-    }
-    .big-num__field:focus { border-color: var(--primary); outline: none; }
-    .big-num__suffix {
-      font-size: 16px;
-      color: var(--muted);
-      font-weight: 600;
-      flex-shrink: 0;
-    }
 
     /* ─── Footer ─────────────────────────────────────────────────── */
     .footer {
@@ -1388,7 +1255,7 @@
       teaser: 'Ex. : e-commerce, magasin, food-truck',
       examples: [
         'Vente en ligne (e-commerce)',
-		'Vente en magasin',
+        'Vente en magasin',
         'Restauration sur place ou à emporter, food-truck',
         'Commerçant ambulant, marché'
       ]
@@ -1819,8 +1686,8 @@
     root.appendChild(el('div', { class: 'section-head' },
       el('h2', null, 'Quelle est votre activité ?'),
       el('p', { html: 'Sélectionnez votre type d\'activité pour préciser votre <strong>régime micro-entreprise.</strong> <br><i>La location de meublés de tourisme n\'est pas couverte par l\'outil</i>.' })
-    ));	
-  
+    ));
+
     const list = el('div', { class: 'famille-list', role: 'group',
       'aria-label': 'Type d\'activité' });
 
@@ -1901,8 +1768,8 @@
       html: 'En micro-entreprise, les taux utilisés pour calculer votre revenu imposable et vos cotisations sociales dépendent de votre type activité.'
     }));
 
-	// Renvoi « hors périmètre » : les locations de meublés de tourisme ne sont pas couvertes
-	// Cotisations à seuils de déclenchement, régime spécifique — trop de complexité
+    // Renvoi « hors périmètre » : les locations de meublés de tourisme ne sont pas couvertes
+    // Cotisations à seuils de déclenchement, régime spécifique — trop de complexité
     root.appendChild(InfoBox({
       tone: 'neutral', icon: 'ℹ️',
       html: 'Pour la <strong>location de meublés de tourisme</strong> (location saisonnière, chambre d’hôtes...), il existe des règles particulières concernant les cotisations sociales (cf. <a href="https://entreprendre.service-public.gouv.fr/vosdroits/F39451" target="_blank" rel="noopener noreferrer" class="info__link">cette fiche</a>).<br>Elles n\'ont pas été intégrées dans MicroFisca pour la simplicité de l\'outil.'
@@ -2228,6 +2095,14 @@
     warn.style.marginTop = '24px';
     root.appendChild(warn);
 
+    // ─── 4. À retenir : versement libératoire ───
+    const vlBox = InfoBox({
+      tone: 'yellow', icon: '📌',
+      html: '<strong>Bon à savoir</strong> : selon votre situation, opter pour le <strong>versement libératoire de l’impôt sur le revenu</strong> peut être plus avantageux que le régime micro-fiscal classique.<br>Cette option est possible sous certaines conditions (cf. <a href="https://www.impots.gouv.fr/professionnel/le-versement-liberatoire" target="_blank" rel="noopener noreferrer" class="btn-link-inline">cette fiche</a>). Elle permet de payer l’impôt directement sur le chiffre d’affaires et à un <strong>taux forfaitaire bas</strong>.'
+    });
+    vlBox.style.marginTop = '24px';
+    root.appendChild(vlBox);
+
     // ─── Nav ───
     root.appendChild(el('div', { class: 'nav' },
       BackBtn(back),
@@ -2397,7 +2272,7 @@
 
     // ─── Section 1 : Qu'est-ce que MicroFisca ? ───
     root.appendChild(el('section', { class: 'about-section' },
-	  el('h3', null, '1. Qu\'est-ce que MicroFisca ?'),
+      el('h3', null, '1. Qu\'est-ce que MicroFisca ?'),
       el('p', { html: 'MicroFisca est un outil pédagogique destiné aux <strong>porteurs de projet, freelances et indépendants</strong> qui envisagent de créer une micro-entreprise, ou qui s’interrogent sur la pertinence de leur statut actuel.' }),
       el('p', { html: 'Il répond à une question simple : <strong>vos charges réelles sont-elles bien couvertes par l’abattement forfaitaire du régime micro-fiscal classique</strong> (avec prélèvement à la source) ?' }),
       el('p', { html: 'En micro-entreprise, l’État applique un abattement forfaitaire fixe pour estimer les frais professionnels (entre 30 % et 71 % selon le type d’activité).' }),
@@ -2427,16 +2302,15 @@
         el('li', { html: '<a href="https://entreprendre.service-public.gouv.fr/vosdroits/F23267" target="_blank" rel="noopener noreferrer">Régime fiscal de la micro-entreprise</a> (version vérifiée le 21 février 2026) ;' }),
         el('li', { html: '<a href="https://www.economie.gouv.fr/entreprises/gerer-sa-micro-entreprise/micro-entreprises-quel-est-le-montant-de-vos-cotisations-sociales" target="_blank" rel="noopener noreferrer">Cotisations sociales 2026</a> (version publiée le 6 mars 2026) ;' }),
         el('li', { html: '<a href="https://entreprendre.service-public.gouv.fr/vosdroits/F32353" target="_blank" rel="noopener noreferrer">Conséquences du dépassement des seuils de CA</a> (version vérifiée le 21 février 2026).' })
-      ),
-      //el('p', { html: `<br><strong>Dernière mise à jour des valeurs : </strong>${DERNIERE_MAJ}.` })
+      )
     );
     
-	// Information sur les mises à jour
+    // Information sur les mises à jour
     section3.appendChild(InfoBox({
       tone: 'neutral', icon: 'ℹ️',
-      html: '<strong>Dernière mise à jour des valeurs : </strong>mai 2026 (les barèmes peuvent avoir évolué entretemps).'
+      html: `<strong>Dernière mise à jour des valeurs : </strong>${DERNIERE_MAJ} (les barèmes peuvent avoir évolué entretemps).`
     }));
-	
+
     root.appendChild(section3);
 
     // Carte feedback
